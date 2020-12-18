@@ -38,6 +38,7 @@ predictions_description = pd.read_csv(predictions_file, delimiter=';', names=['u
 
 def predict_collaborative_filtering(movies, users, ratings, predictions):
     # TO COMPLETE
+    userMovieMatrix = pd.concat([users_description, movies_description])
 
     pass
 
