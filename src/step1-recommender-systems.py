@@ -38,10 +38,23 @@ predictions_description = pd.read_csv(predictions_file, delimiter=';', names=['u
 
 def predict_collaborative_filtering(movies, users, ratings, predictions):
     # TO COMPLETE
-    userMovieMatrix = pd.concat([users_description, movies_description])
+    
+    #userRatingMatrix => merge users and their ratings
+    uRM = pd.merge(users, ratings, on='userID')
 
-    pass
+    print(uRM)
+    print("\n\n\n")
 
+
+    #userRatingMoviesMatrix => merge users+ratings on the movies they watched
+    uRMM = pd.merge(uRM, movies, on='movieID')
+
+    print(uRMM)
+
+    return uRMM
+
+pd.set_option("display.max_rows", 100)
+predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
 
 #####
 ##
