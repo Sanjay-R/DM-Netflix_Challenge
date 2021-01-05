@@ -52,7 +52,7 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     # print(uRMM)
     print("\n\n\n")
 
-    userMovie = uRMM.pivot(index = 'movieID', columns= 'userID', values= 'rating')
+    userMovie = uRMM.pivot(index = 'userID', columns= 'movieID', values= 'rating')
     print(userMovie)
 
     return uRMM
