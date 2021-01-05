@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import os.path
 from random import randint
+import pearson as p
 
 # -*- coding: utf-8 -*-
 """
@@ -43,17 +44,18 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     uRM = pd.merge(users, ratings, on='userID')
 
     # print(uRM)
-    print("\n\n\n")
+    # print("\n\n\n")
 
 
     #userRatingMoviesMatrix => merge users+ratings on the movies they watched
     uRMM = pd.merge(uRM, movies, on='movieID')
 
     # print(uRMM)
-    print("\n\n\n")
+    # print("\n\n\n")
 
     userMovie = uRMM.pivot(index = 'userID', columns= 'movieID', values= 'rating')
-    print(userMovie)
+    # print(userMovie)
+    p.pearson(userMovie)
 
     return uRMM
 
