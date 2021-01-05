@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="07bd8036-2249-401c-90f7-3301bc3692b3" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/movies.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/predictions.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ratings.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/submission.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/users.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/step1-recommender-systems.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/step1-recommender-systems.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -109,8 +105,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.hello" />
       <item itemvalue="Python.step1-recommender-systems" />
+      <item itemvalue="Python.hello" />
     </list>
     <recent_temporary>
       <list>
@@ -131,6 +127,7 @@
       <workItem from="1609673746080" duration="1292000" />
       <workItem from="1609696127346" duration="1614000" />
       <workItem from="1609700563944" duration="5653000" />
+      <workItem from="1609869264045" duration="1619000" />
     </task>
     <servers />
   </component>
@@ -154,29 +151,29 @@
       <screen x="0" y="0" width="1500" height="960" />
     </state>
     <state x="531" y="235" key="FileChooserDialogImpl/0.0.1500.960@0.0.1500.960" timestamp="1609698112869" />
-    <state width="1458" height="256" key="GridCell.Tab.0.bottom" timestamp="1609778201209">
+    <state width="1458" height="256" key="GridCell.Tab.0.bottom" timestamp="1609870983019">
       <screen x="0" y="0" width="1500" height="960" />
     </state>
-    <state width="1458" height="256" key="GridCell.Tab.0.bottom/0.0.1500.960@0.0.1500.960" timestamp="1609778201209" />
-    <state width="1458" height="256" key="GridCell.Tab.0.center" timestamp="1609778201209">
+    <state width="1458" height="256" key="GridCell.Tab.0.bottom/0.0.1500.960@0.0.1500.960" timestamp="1609870983019" />
+    <state width="1458" height="256" key="GridCell.Tab.0.center" timestamp="1609870983019">
       <screen x="0" y="0" width="1500" height="960" />
     </state>
-    <state width="1458" height="256" key="GridCell.Tab.0.center/0.0.1500.960@0.0.1500.960" timestamp="1609778201209" />
-    <state width="1458" height="256" key="GridCell.Tab.0.left" timestamp="1609778201208">
+    <state width="1458" height="256" key="GridCell.Tab.0.center/0.0.1500.960@0.0.1500.960" timestamp="1609870983019" />
+    <state width="1458" height="256" key="GridCell.Tab.0.left" timestamp="1609870983019">
       <screen x="0" y="0" width="1500" height="960" />
     </state>
-    <state width="1458" height="256" key="GridCell.Tab.0.left/0.0.1500.960@0.0.1500.960" timestamp="1609778201208" />
-    <state width="1458" height="256" key="GridCell.Tab.0.right" timestamp="1609778201209">
+    <state width="1458" height="256" key="GridCell.Tab.0.left/0.0.1500.960@0.0.1500.960" timestamp="1609870983019" />
+    <state width="1458" height="256" key="GridCell.Tab.0.right" timestamp="1609870983019">
       <screen x="0" y="0" width="1500" height="960" />
     </state>
-    <state width="1458" height="256" key="GridCell.Tab.0.right/0.0.1500.960@0.0.1500.960" timestamp="1609778201209" />
+    <state width="1458" height="256" key="GridCell.Tab.0.right/0.0.1500.960@0.0.1500.960" timestamp="1609870983019" />
     <state x="332" y="106" key="SettingsEditor" timestamp="1609711073507">
       <screen x="0" y="0" width="1500" height="960" />
     </state>
     <state x="332" y="106" key="SettingsEditor/0.0.1500.960@0.0.1500.960" timestamp="1609711073507" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/DM_Netlifx_Challenge$step1_recommender_systems.coverage" NAME="step1-recommender-systems Coverage Results" MODIFIED="1609778201194" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/DM_Netlifx_Challenge$step1_recommender_systems.coverage" NAME="step1-recommender-systems Coverage Results" MODIFIED="1609870983004" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
     <SUITE FILE_PATH="coverage/DM_Netlifx_Challenge$hello.coverage" NAME="hello Coverage Results" MODIFIED="1609711185943" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
 </project>
