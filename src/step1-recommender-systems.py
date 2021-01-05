@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import os.path
 from random import randint
-import pearson as p
+import utilFunctions as uf
 
 # -*- coding: utf-8 -*-
 """
@@ -55,8 +55,8 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
     userMovie = uRMM.pivot(index = 'userID', columns= 'movieID', values= 'rating')
     umNumpy = userMovie.to_numpy()
-    # print(umNumpy)
-    foo = p.pearson(umNumpy)
+    print(userMovie.corr(method="pearson"))
+    userUser = uf.pearson(umNumpy)
 
     np.corrcoef()
 
