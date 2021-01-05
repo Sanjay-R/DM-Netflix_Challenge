@@ -5,6 +5,6 @@ from random import randint
 
 def pearson(userMovie):
 
-    pe = np.ma.corrcoef(userMovie)
-    
+    pe = np.ma.corrcoef(np.ma.masked_invalid(userMovie))
+    print(pe[:40, :50])
     return pe
