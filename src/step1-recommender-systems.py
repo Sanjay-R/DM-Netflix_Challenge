@@ -54,8 +54,9 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     # print("\n\n\n")
 
     userMovie = uRMM.pivot(index = 'userID', columns= 'movieID', values= 'rating')
-    # print(userMovie)
-    p.pearson(userMovie)
+    umNumpy = userMovie.to_numpy()
+    # print(umNumpy)
+    foo = p.pearson(umNumpy)
 
     return uRMM
 

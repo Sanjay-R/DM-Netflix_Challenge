@@ -4,7 +4,8 @@ import os.path
 from random import randint
 
 def pearson(userMovie):
-    return sim(userMovie.iloc[0], userMovie.iloc[1])
+    pear = sim(userMovie[0], userMovie[1])
+    pass
 
 def sim(x, y):
 
@@ -12,9 +13,9 @@ def sim(x, y):
     ySD = np.std(y)
     cov = np.cov(x, y)
 
-    temp = np.corrcoef(x, y)
+    temp = np.corrcoef(x)
 
-    print("correcoef => " + temp + "\n")
-    print("p XY => " + cov/xSD*ySD)
+    print("correcoef => " , temp , "\n")
+    print("p XY => " , cov/xSD*ySD)
 
     return cov
