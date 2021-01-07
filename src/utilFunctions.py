@@ -13,7 +13,15 @@ def threshold(t, df):
 
     # for i, j in df.iterrows():
     #     print("\ni => " , i , "\n")
-    #     print("\nj => " , j)
+    #     print("\nj => " , j[1])
+
+    
+    
+    # organ = df[df > t]
+    # print(organ)
+
+
+
     pass
 
 def selectTop(n, df):

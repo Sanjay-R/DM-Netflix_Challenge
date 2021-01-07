@@ -53,10 +53,13 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
     userMovie = uRMM.pivot(index = 'movieID', columns= 'userID', values= 'rating')
 
-    #user-user collaborative matrix
-    utilMatrix = userMovie.corr(method="pearson")
+    #TODO: REMOVE THIS TEMP 500X500 CUT
+    um = userMovie.iloc[:500,:500]
 
-    #print(utilMatrix)
+    #user-user collaborative matrix
+    utilMatrix = um.corr(method="pearson")
+
+    print(utilMatrix)
 
     thres = uf.threshold(0.2, utilMatrix)
 
