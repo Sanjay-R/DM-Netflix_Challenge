@@ -8,3 +8,16 @@ def pearson(userMovie):
     #
 
     pass
+
+def threshold(t, df):
+
+    # for i, j in df.iterrows():
+    #     print("\ni => " , i , "\n")
+    #     print("\nj => " , j)
+    pass
+
+def selectTop(n, df):
+
+    #
+
+    pass

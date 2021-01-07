@@ -42,23 +42,25 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     
     #userRatingMatrix => merge users and their ratings
     uRM = pd.merge(users, ratings, on='userID')
-
-    print(uRM)
-    print("\n\n\n")
+    # print(uRM)
+    # print("\n\n\n")
 
 
     #userRatingMoviesMatrix => merge users+ratings on the movies they watched
     uRMM = pd.merge(uRM, movies, on='movieID')
-
-    print(uRMM)
-    print("\n\n\n")
+    # print(uRMM)
+    # print("\n\n\n")
 
     userMovie = uRMM.pivot(index = 'movieID', columns= 'userID', values= 'rating')
 
     #user-user collaborative matrix
     utilMatrix = userMovie.corr(method="pearson")
 
-    print(utilMatrix)
+    #print(utilMatrix)
+
+    thres = uf.threshold(0.2, utilMatrix)
+
+    print(thres)
 
     return uRMM
 
