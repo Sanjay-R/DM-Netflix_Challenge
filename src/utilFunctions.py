@@ -26,6 +26,11 @@ def threshold(t, df):
 
 def selectTop(n, df):
 
-    #
+    #pd.DataFrame(np.sort(df.values, axis=0), index=df.index, columns=df.columns)
 
+    # df = df.apply(lambda x: x.sort_values().values)
+
+    df.apply(pd.Series.nlargest, axis=1, n=2)
+
+    print(df)
     pass

@@ -18,11 +18,11 @@ To know more about the expectations, please refer to the guidelines.
 #####
 
 #Where data is located
-movies_file = './data/movies.csv'
-users_file = './data/users.csv'
-ratings_file = './data/ratings.csv'
-predictions_file = './data/predictions.csv'
-submission_file = './data/submission.csv'
+movies_file = 'movies.csv'
+users_file = 'users.csv'
+ratings_file = 'ratings.csv'
+predictions_file = 'predictions.csv'
+submission_file = 'submission.csv'
 
 
 # Read the data using pandas
@@ -48,7 +48,9 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
     #userRatingMoviesMatrix => merge users+ratings on the movies they watched
     uRMM = pd.merge(uRM, movies, on='movieID')
-    # print(uRMM)
+    # pd.set_option('display.max_columns', None)
+    # pd.set_option('display.max_rows', None)
+    # print(uRMM[uRMM["userID"] == 497])
     # print("\n\n\n")
 
     userMovie = uRMM.pivot(index = 'movieID', columns= 'userID', values= 'rating')
@@ -59,11 +61,16 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     #user-user collaborative matrix
     utilMatrix = um.corr(method="pearson")
 
-    print(utilMatrix)
+    # print(utilMatrix)
 
-    thres = uf.threshold(0.2, utilMatrix)
+    topN = uf.selectTop(5 , utilMatrix)
 
-    print(thres)
+    print(topN)
+
+
+    #thres = uf.threshold(0.2, utilMatrix)
+    #
+    # print(thres)
 
     return uRMM
 
