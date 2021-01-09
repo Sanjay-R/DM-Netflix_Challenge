@@ -57,17 +57,16 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     um = userMovie.iloc[:500,:500]
 
     #user-user collaborative matrix
-    utilMatrix = uf.pearson(userMovie)
+    utilMatrix = uf.pearson(um)
 
     # print(utilMatrix)
 
     thres = uf.threshold(0.2, 50, utilMatrix)
 
-    print(thres)
+    print(thres.shape)
 
-    return uRMM
+    return thres
 
-pd.set_option("display.max_rows", 100)
 predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
 
 #####
