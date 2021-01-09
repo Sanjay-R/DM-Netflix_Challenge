@@ -57,13 +57,13 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     um = userMovie.iloc[:500,:500]
 
     #user-user collaborative matrix
-    utilMatrix = userMovie.corr(method="pearson")
+    utilMatrix = uf.pearson(userMovie)
 
     # print(utilMatrix)
 
-    thres = uf.threshold(0.2, utilMatrix)
+    thres = uf.threshold(0.2, 50, utilMatrix)
 
-    # print(thres)
+    print(thres)
 
     return uRMM
 
