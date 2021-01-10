@@ -3,7 +3,7 @@ import pandas as pd
 import os.path
 from random import randint
 
-def pearson(userMovie):
+def pearson(userMovie : pd.DataFrame):
 
     return userMovie.corr(method="pearson")
 

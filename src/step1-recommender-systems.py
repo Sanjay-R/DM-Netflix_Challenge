@@ -3,6 +3,7 @@ import pandas as pd
 import os.path
 from random import randint
 import utilFunctions as uf
+import time as t
 
 # -*- coding: utf-8 -*-
 """
@@ -57,17 +58,21 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     um = userMovie.iloc[:500,:500]
 
     #user-user collaborative matrix
-    utilMatrix = uf.pearson(um)
+    utilMatrix = uf.pearson(userMovie)
 
     # print(utilMatrix)
 
     thres = uf.threshold(0.2, 50, utilMatrix)
 
-    print(thres.shape)
+    # print(thres)
 
     return thres
 
+start = t.time()
 predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
+end = t.time()
+
+print("TIME ELAPSED => ", end-start)
 
 #####
 ##
