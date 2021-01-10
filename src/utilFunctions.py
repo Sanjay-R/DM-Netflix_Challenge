@@ -23,7 +23,11 @@ def selectTop(neighbors, df):
     return ret
 
 def seriesLargestTop(neighbors: int, row : pd.Series):
+
+    # Sort each by row and get their index
     s = row.nlargest(neighbors + 1, keep='all').head(neighbors + 1).index.to_numpy()
+    # Ignore your own value (user 3 - user 3 bijv), which is also why we take neighbors+1 largest values
+    # Use row.name to get the index
     s = np.delete(s, np.argwhere(s == row.name))
     # If there aren't enough neighbors, pad the array with zeros up to neighbors
     s = np.pad(s, (0, max(0, (neighbors - s.size))), 'constant', constant_values=(0, 0))
