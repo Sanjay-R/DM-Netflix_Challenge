@@ -48,3 +48,18 @@ def seriesLargest(neighbors : int, t : float, row : pd.Series):
     # print ("=> \n", s , " size=", s.size)
 
     return s
+
+def normalized_row(df: pd.DataFrame):
+    df_mean = df.mean(axis=1)
+    df_normal = df.subtract(df_mean, axis = 'rows')
+    # print(df_normal)
+    return df_normal
+
+def scoreItem(df,neighbor_rating, neighbor_similarity, ratings):
+
+    #We will be using the weighted average method to compute the score.
+    #We want to only score items that have not been scored yet.
+    normalized_row(df)
+
+
+    pass

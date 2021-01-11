@@ -61,12 +61,13 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
     # print(utilMatrix)
 
-    thres = uf.threshold(0.2, 50, utilMatrix)
+    # thres = uf.threshold(0.2, 50, utilMatrix)
 
     top = uf.selectTop(50,utilMatrix)
 
-    print(thres)
-    print(top)
+    # print(thres)
+    print(utilMatrix)
+    print(uf.normalized_row(utilMatrix))
 
     return top
 
