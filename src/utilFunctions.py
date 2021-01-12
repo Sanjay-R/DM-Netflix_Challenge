@@ -16,7 +16,7 @@ def threshold(t : float, neighbors :int, df : pd.DataFrame):
 
     return ret
 
-def selectTop(neighbors, df):
+def selectTopNeighbors(neighbors, df):
 
     ret = df.apply(lambda row: seriesLargestTop(neighbors, row), axis=1)
 
@@ -49,17 +49,46 @@ def seriesLargest(neighbors : int, t : float, row : pd.Series):
 
     return s
 
-def normalized_row(df: pd.DataFrame):
+def normalized_data(df: pd.DataFrame):
     df_mean = df.mean(axis=1)
     df_normal = df.subtract(df_mean, axis = 'rows')
     # print(df_normal)
     return df_normal
 
-def scoreItem(df,neighbor_rating, neighbor_similarity, ratings):
+def normalized_row(user: pd.Series):
+    user_mean = user.mean
+    user_normal = user.subtract(user_mean)
+    return user_normal
+
+
+def scoreRow(ratings: pd.Series , neighbors: pd.Series):
+    ratings_avg = ratings.mean
+
+    score = np.dot()
+
+
+
+
+
+def scoreItem(df: pd.DataFrame ,user: pd.Series
+              ,neighbor_rating, neighbor_similarity, ratings):
 
     #We will be using the weighted average method to compute the score.
     #We want to only score items that have not been scored yet.
-    normalized_row(df)
+    # user_norm = normalized_row(user)
+    # avg_ratings = user.mean
+    #
+    # selectTopNeighbors(df)
+
+
+    #Two dataframes: Neighbors and Ratings
+
+    df_normal = normalized_data(df)
+
+    df_normal.apply(scoreRow(row))
+
+    for
+
 
 
     pass
