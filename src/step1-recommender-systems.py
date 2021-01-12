@@ -18,11 +18,11 @@ To know more about the expectations, please refer to the guidelines.
 #####
 
 #Where data is located
-movies_file = './data/movies.csv'
-users_file = './data/users.csv'
-ratings_file = './data/ratings.csv'
-predictions_file = './data/predictions.csv'
-submission_file = './data/submission.csv'
+movies_file = 'movies.csv'
+users_file = 'users.csv'
+ratings_file = 'ratings.csv'
+predictions_file = 'predictions.csv'
+submission_file = 'submission.csv'
 
 
 # Read the data using pandas
@@ -61,13 +61,14 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
     # print(utilMatrix)
 
-    # thres = uf.threshold(0.2, 50, utilMatrix)
+    thres = uf.threshold(0.2, 50, utilMatrix)
 
-    top = uf.selectTop(50,utilMatrix)
+    top = uf.selectTopNeighbors(50,utilMatrix)
 
-    # print(thres)
-    print(utilMatrix)
-    print(uf.normalized_row(utilMatrix))
+
+    # print(utilMatrix)
+    print(uf.normalized_data(userMovie))
+    print(thres)
 
     return top
 

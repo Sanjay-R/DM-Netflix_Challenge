@@ -57,17 +57,21 @@ def normalized_data(df: pd.DataFrame):
 
 def normalized_row(user: pd.Series):
     user_mean = user.mean
-    user_normal = user.subtract(user_mean)
-    return user_normal
+    # user_normal = user.subtract(user_mean)
+    # return user_normal
+    pass
 
-
-def scoreRow(ratings: pd.Series , neighbors: pd.Series):
+def scoreRow(userMovies: pd.DataFrame, ratings: pd.Series , neighbors: pd.Series , movie: pd.Index):
     ratings_avg = ratings.mean
+    # normalized_data(userMovies)
+    # User 42 : [Nan ,Nan , 0.45 , Nan , 0.85]
+
+    for movie_rating in ratings:
+        if movie_rating.isnull:
+            movie_rating_predic = userMovies.iloc[neighborsID , movie]
 
     score = np.dot()
-
-
-
+    pass
 
 
 def scoreItem(df: pd.DataFrame ,user: pd.Series
@@ -85,10 +89,6 @@ def scoreItem(df: pd.DataFrame ,user: pd.Series
 
     df_normal = normalized_data(df)
 
-    df_normal.apply(scoreRow(row))
-
-    for
-
-
+    # df_normal.apply(scoreRow(row))
 
     pass
