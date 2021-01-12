@@ -3,7 +3,6 @@ import pandas as pd
 import os.path
 from random import randint
 import utilFunctions as uf
-import time as t
 
 # -*- coding: utf-8 -*-
 """
@@ -68,11 +67,8 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
     return thres
 
-start = t.time()
 predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
-end = t.time()
 
-print("TIME ELAPSED => ", end-start)
 
 #####
 ##
