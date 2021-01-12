@@ -57,7 +57,7 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     um = userMovie.iloc[:500,:500]
 
     #user-user collaborative matrix
-    utilMatrix = uf.pearson(um)
+    utilMatrix = uf.pearson(userMovie)
 
     # print(utilMatrix)
 
@@ -71,6 +71,7 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     return top
 
 predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
+
 
 #####
 ##
