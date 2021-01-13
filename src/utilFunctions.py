@@ -66,23 +66,26 @@ def normalized_row(user: pd.Series):
 
 
 def score(userMovies: pd.DataFrame,
-          correlation: pd.DataFrame, ratings: pd.Series, neighbors: pd.Series, movie):
+          correlation: pd.DataFrame, user_ratings: pd.Series, neighbors: pd.Series, movie_ID):
+
     # normalized_data(userMovies)
     # User 42 : [Nan ,Nan , 0.45 , Nan , 0.85]
 
-    if movie in ratings:
-        return ratings[movie]
+    # if movie_ID in user_ratings:
+    #     return user_ratings[movie_ID]
 
-    ratings_avg = ratings.mean
+    #Get the average ratings of the user
+    ratings_avg = user_ratings.mean
+    #Similarity of the ratings of the neighbors to the user that we calculated
     sim_sum = 0
     for n in neighbors:
-        sim_sum += correlation.at[movie, n]
-
+        sim_sum += correlation.loc[user_ratings[1], n]
+    #Similarity times the normalized average ratings of the users
     sim_times_rating = 0
     for n in neighbors:
-        sim_times_rating += (correlation.at[movie, n]
-                             * (userMovies.at[movie, n] - userMovies[n].mean))
-
+        sim_times_rating += (correlation.loc[user_ratings[1], n]
+                             * (userMovies.loc[movie_ID, n] - userMovies[:, n].mean))
+    #Calculate the final score
     score = ratings_avg + (sim_times_rating / sim_sum)
 
     return score

@@ -57,8 +57,8 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
     userMovie = uRMM.pivot(index='movieID', columns='userID', values='rating')
 
-    # TODO: REMOVE THIS TEMP 500X500 CUT
-    um = userMovie.iloc[:500, :500]
+    # # TODO: REMOVE THIS TEMP 500X500 CUT
+    um = userMovie#.iloc[:500, :500]
 
     # user-user collaborative matrix
     utilMatrix = uf.pearson(um)
@@ -69,9 +69,9 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
     top = uf.selectTopNeighbors(50, utilMatrix)
 
-    predict_test = uf.score(um, utilMatrix, um.loc['1914'], top.loc['1914'], 1635)
+    predict_test = uf.score(um, utilMatrix, um.iloc(axis=0)[8], top.iloc(axis=0)[8], um.iloc(axis=1)[39])
 
-    # print(utilMatrix)
+    print(utilMatrix)
     print(uf.normalized_data(userMovie))
     print(thres)
     print(predict_test)
