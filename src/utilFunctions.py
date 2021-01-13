@@ -3,8 +3,8 @@ import pandas as pd
 import os.path
 from random import randint
 
-def pearson(userMovie : pd.DataFrame):
 
+def pearson(userMovie):
     return userMovie.corr(method="pearson")
 
 
@@ -38,3 +38,57 @@ def seriesLargest(neighbors : int, row : pd.Series):
     s = np.pad(s, (0, max(0, (neighbors - s.size))), 'constant', constant_values = (0,0))
 
     return s
+
+def normalized_data(df: pd.DataFrame):
+    df_mean = df.mean(axis=1)
+    df_normal = df.subtract(df_mean, axis='rows')
+    # print(df_normal)
+    return df_normal
+
+
+def normalized_row(user: pd.Series):
+    user_mean = user.mean
+    # user_normal = user.subtract(user_mean)
+    # return user_normal
+    pass
+
+
+def score(userMovies: pd.DataFrame,
+          correlation: pd.DataFrame, ratings: pd.Series, neighbors: pd.Series, movie):
+    # normalized_data(userMovies)
+    # User 42 : [Nan ,Nan , 0.45 , Nan , 0.85]
+
+    if movie in ratings:
+        return ratings[movie]
+
+    ratings_avg = ratings.mean
+    sim_sum = 0
+    for n in neighbors:
+        sim_sum += correlation.at[movie, n]
+
+    sim_times_rating = 0
+    for n in neighbors:
+        sim_times_rating += (correlation.at[movie, n]
+                             * (userMovies.at[movie, n] - userMovies[n].mean))
+
+    score = ratings_avg + (sim_times_rating / sim_sum)
+
+    return score
+
+
+def scoreItem(df: pd.DataFrame, user: pd.Series
+              , neighbor_rating, neighbor_similarity, ratings):
+    # We will be using the weighted average method to compute the score.
+    # We want to only score items that have not been scored yet.
+    # user_norm = normalized_row(user)
+    # avg_ratings = user.mean
+    #
+    # selectTopNeighbors(df)
+
+    # Two dataframes: Neighbors and Ratings
+
+    df_normal = normalized_data(df)
+
+    # df_normal.apply(scoreRow(row))
+
+    pass

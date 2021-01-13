@@ -39,36 +39,40 @@ predictions_description = pd.read_csv(predictions_file, delimiter=';', names=['u
 
 def predict_collaborative_filtering(movies, users, ratings, predictions):
     # TO COMPLETE
-    
-    #userRatingMatrix => merge users and their ratings
+
+    # userRatingMatrix => merge users and their ratings
     uRM = pd.merge(users, ratings, on='userID')
     # print(uRM)
     # print("\n\n\n")
 
-
-    #userRatingMoviesMatrix => merge users+ratings on the movies they watched
+    # userRatingMoviesMatrix => merge users+ratings on the movies they watched
     uRMM = pd.merge(uRM, movies, on='movieID')
     # print(uRMM)
     # print("\n\n\n")
 
-    userMovie = uRMM.pivot(index = 'movieID', columns= 'userID', values= 'rating')
+    userMovie = uRMM.pivot(index='movieID', columns='userID', values='rating')
 
-    #TODO: REMOVE THIS TEMP 500X500 CUT
-    um = userMovie.iloc[:500,:500]
+    # TODO: REMOVE THIS TEMP 500X500 CUT
+    um = userMovie.iloc[:500, :500]
 
-    #user-user collaborative matrix
-    utilMatrix = uf.pearson(userMovie)
+    # user-user collaborative matrix
+    utilMatrix = uf.pearson(um)
 
     # print(utilMatrix)
 
     thres = uf.threshold(0.2, 50, utilMatrix)
 
-    top = uf.selectTop(50,utilMatrix)
+    top = uf.selectTop(50, utilMatrix)
 
+    # predict_test = uf.score(um, utilMatrix, um.loc['1914'], top.loc['1914'], 1635)
+
+    # print(utilMatrix)
+    print(uf.normalized_data(userMovie))
     print(thres)
-    print(top)
+    # print(predict_test)
 
     return top
+
 
 predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
 
@@ -109,6 +113,7 @@ def predict_random(movies, users, ratings, predictions):
     number_predictions = len(predictions)
 
     return [[idx, randint(1, 5)] for idx in range(1, number_predictions + 1)]
+
 
 #####
 ##
