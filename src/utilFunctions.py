@@ -58,16 +58,22 @@ def normalized_data(df: pd.DataFrame):
     return df_normal
 
 
-def score(user_movies_matrix: pd.DataFrame,
-          correlation: pd.DataFrame, user_id, user_ratings: pd.Series, neighbors: pd.Series, movie_id):
+def score(user_movies_matrix: pd.DataFrame, correlation: pd.DataFrame, user_id, movie_id):
     # We use the normalized dataset here.
 
-    ##TODO: The user already had a rating
-    # if movie_ID in user_ratings:
-    #     return user_ratings[movie_ID]
+    active_user_ratings = user_movies_matrix[user_id]
+
+    # We get all the neighbors.
+    neighbors_matrix = selectTopNeighbors(50, correlation)
+    # Neighbors of the user.
+    neighbors = neighbors_matrix[user_id]
+
+    # Check if it's already rated.
+    if pd.notna(active_user_ratings[movie_id]):
+        return active_user_ratings[movie_id]
 
     # Get the average ratings of the user
-    ratings_avg = user_ratings.mean(axis=0)
+    ratings_avg = active_user_ratings.mean(axis=0)
 
     # Similarity of the ratings of the neighbors to the user that we calculated. It's the denominator.
     sim_sum = 0
