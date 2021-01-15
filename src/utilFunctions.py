@@ -78,9 +78,9 @@ def score(userMovies: pd.DataFrame,
     # Similarity times the normalized average ratings of the users
     sim_times_rating = 0
     for n in neighbors:
-         
-            print("Neighbor num :", n, "Movie ", userMovies[n][movie_ID])
-            sim_times_rating += (correlation[user_ID][n] * (userMovies[n][movie_ID] - userMovies[n].mean(axis=0)))
+        if pd.notna(userMovies[n][movie_ID]):
+                        print("Neighbor num :", n, "Movie ", userMovies[n][movie_ID])
+                        sim_times_rating += (correlation[user_ID][n] * (userMovies[n][movie_ID] - userMovies[n].mean(axis=0)))
     # Calculate the final score
     predicted_score = ratings_avg + (sim_times_rating / sim_sum)
 

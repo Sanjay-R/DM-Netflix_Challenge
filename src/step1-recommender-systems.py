@@ -58,7 +58,7 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     userMovie = uRMM.pivot(index='movieID', columns='userID', values='rating')
 
     # # TODO: REMOVE THIS TEMP 500X500 CUT
-    um = userMovie.iloc[:500, :500]
+    um = userMovie#.iloc[:500, :500]
 
     normal_um = uf.normalized_data(um)
 
