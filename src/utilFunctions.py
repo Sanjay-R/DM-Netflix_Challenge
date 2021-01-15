@@ -58,29 +58,30 @@ def normalized_data(df: pd.DataFrame):
     return df_normal
 
 
-def score(userMovies: pd.DataFrame,
-          correlation: pd.DataFrame, user_ID, user_ratings: pd.Series, neighbors: pd.Series, movie_ID):
-    # normalized_data(userMovies)
-    # User 42 : [Nan ,Nan , 0.45 , Nan , 0.85]
+def score(user_movies_matrix: pd.DataFrame,
+          correlation: pd.DataFrame, user_id, user_ratings: pd.Series, neighbors: pd.Series, movie_id):
+    # We use the normalized dataset here.
 
+    ##TODO: The user already had a rating
     # if movie_ID in user_ratings:
     #     return user_ratings[movie_ID]
 
-    # print(user_ratings[movie_ID])
-
     # Get the average ratings of the user
     ratings_avg = user_ratings.mean(axis=0)
-    # print(neighbors)
-    # Similarity of the ratings of the neighbors to the user that we calculated
+
+    # Similarity of the ratings of the neighbors to the user that we calculated. It's the denominator.
     sim_sum = 0
     for n in neighbors:
-        sim_sum += correlation[user_ID][n]
-    # Similarity times the normalized average ratings of the users
+        sim_sum += correlation[user_id][n]
+
+    # Similarity times the normalized average ratings of the users. This is the nominator.
     sim_times_rating = 0
     for n in neighbors:
-        if pd.notna(userMovies[n][movie_ID]):
-                        print("Neighbor num :", n, "Movie ", userMovies[n][movie_ID])
-                        sim_times_rating += (correlation[user_ID][n] * (userMovies[n][movie_ID] - userMovies[n].mean(axis=0)))
+        # If the neighbors have rated that movie, calculate this.
+        if pd.notna(user_movies_matrix[n][movie_id]):
+            sim_times_rating += (correlation[user_id][n] * (
+                    user_movies_matrix[n][movie_id] - user_movies_matrix[n].mean(axis=0)))
+
     # Calculate the final score
     predicted_score = ratings_avg + (sim_times_rating / sim_sum)
 
