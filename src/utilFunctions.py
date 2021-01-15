@@ -10,8 +10,8 @@ def pearson(userMovie):
 
 def threshold(t: float, neighbors: int, df: pd.DataFrame):
 
-    #Lower limit for neighbors is 20
-    neighbors = max(20, neighbors)
+    #Lower limit for neighbors is 10
+    neighbors = max(10, neighbors)
 
     ret = df.apply(lambda row: seriesLargest(neighbors, row[(row > t)]), axis=1)
 
@@ -44,13 +44,6 @@ def normalized_data(df: pd.DataFrame):
     df_normal = df.subtract(df_mean, axis='rows')
     # print(df_normal)
     return df_normal
-
-
-def normalized_row(user: pd.Series):
-    user_mean = user.mean
-    # user_normal = user.subtract(user_mean)
-    # return user_normal
-    pass
 
 
 def score(userMovies: pd.DataFrame,
@@ -92,3 +85,34 @@ def scoreItem(df: pd.DataFrame, user: pd.Series
     # df_normal.apply(scoreRow(row))
 
     pass
+
+
+def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, NN: pd.Series, userMovie: pd.DataFrame):
+    newPredictions = predictions.apply(lambda uM: 
+                ratingScore(uM, predictions, utilMatrix, NN, userMovie), axis=1)
+    pass
+
+def ratingScore(uM, predictions: pd.DataFrame, utilMatrix: pd.DataFrame, NN: pd.Series, userMovie: pd.DataFrame):
+    
+    #Convert to numpy and set properly
+    uM1 = uM.to_numpy()
+    userID = uM1[0]
+    movieID = uM1[1]
+
+    #Check if movie has already been rated
+    if(userMovie[userID][movieID] != np.nan):
+        print(userMovie[userID][movieID]) #userMovie[3110][2]
+    #Ignore zero-values in NN array, zeros means that there are no neighbors
+    # buren = NN[(NN > 0)]
+    # if(buren.size < 1):
+    #     return np.nan
+    
+    # #The rxi = numerator/denominator
+    # #Check if denominator != 0
+    # denominator = np.sum(utilMatrix[NN])
+    # if(denominator != 0):
+    #     nominator = 0
+    # else:
+    #     return np.nan
+
+    return 0

@@ -56,22 +56,23 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     um = userMovie.iloc[:500, :500]
 
     # user-user collaborative matrix
-    utilMatrix = uf.pearson(userMovie)
+    utilMatrix = uf.pearson(um)
 
     # print(utilMatrix)
 
     thres = uf.threshold(0.2, 50, utilMatrix)
 
-    top = uf.selectTop(50, utilMatrix)
+    # top = uf.selectTop(50, utilMatrix)
 
     # predict_test = uf.score(um, utilMatrix, um.loc['1914'], top.loc['1914'], 1635)
 
     # print(utilMatrix)
-    print(uf.normalized_data(userMovie))
-    print(thres)
+    # print(uf.normalized_data(userMovie))
+    # print(thres)
     # print(predict_test)
+    rate = uf.rating(predictions, utilMatrix, thres, userMovie)
 
-    return top
+    return thres
 
 
 predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
