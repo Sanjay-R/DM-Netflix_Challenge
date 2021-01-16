@@ -40,17 +40,22 @@ predictions_description = pd.read_csv(predictions_file, delimiter=';', names=['u
 def predict_collaborative_filtering(movies, users, ratings, predictions):
     # TO COMPLETE
 
-    # userRatingMatrix => merge users and their ratings
+    #userRatingMatrix => merge users and their ratings
     uRM = pd.merge(users, ratings, on='userID')
     # print(uRM)
     # print("\n\n\n")
 
-    # userRatingMoviesMatrix => merge users+ratings on the movies they watched
+    #userRatingMoviesMatrix => merge users+ratings on the movies they watched
     uRMM = pd.merge(uRM, movies, on='movieID')
     # print(uRMM)
     # print("\n\n\n")
 
+    #userMovie matrix which sets movieID on the rows and userID on the column.
+    #The ratings are filled in as values
     userMovie = uRMM.pivot(index='movieID', columns='userID', values='rating')
+
+    #Now make sure to fill in lost rows
+    userMovie = userMovie.reindex(pd.RangeIndex(1, userMovie.index.max() + 1))
 
     # TODO: REMOVE THIS TEMP 500X500 CUT
     um = userMovie.iloc[:500, :500]
@@ -58,9 +63,11 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     # user-user collaborative matrix
     utilMatrix = uf.pearson(um)
 
-    # print(utilMatrix)
+    print(userMovie)
 
     thres = uf.threshold(0.2, 50, utilMatrix)
+
+    print(userMovie[2507][1569])
 
     # top = uf.selectTop(50, utilMatrix)
 

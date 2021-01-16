@@ -87,12 +87,12 @@ def scoreItem(df: pd.DataFrame, user: pd.Series
     pass
 
 
-def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, NN: pd.Series, userMovie: pd.DataFrame):
+def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn: pd.Series, userMovie: pd.DataFrame):
     newPredictions = predictions.apply(lambda uM: 
-                ratingScore(uM, predictions, utilMatrix, NN, userMovie), axis=1)
+                ratingScore(uM, predictions, utilMatrix, nn, userMovie), axis=1)
     pass
 
-def ratingScore(uM, predictions: pd.DataFrame, utilMatrix: pd.DataFrame, NN: pd.Series, userMovie: pd.DataFrame):
+def ratingScore(uM, predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn: pd.Series, userMovie: pd.DataFrame):
     
     #Convert to numpy and set properly
     uM1 = uM.to_numpy()
@@ -100,10 +100,11 @@ def ratingScore(uM, predictions: pd.DataFrame, utilMatrix: pd.DataFrame, NN: pd.
     movieID = uM1[1]
 
     #Check if movie has already been rated
-    if(userMovie[userID][movieID] != np.nan):
-        print(userMovie[userID][movieID]) #userMovie[3110][2]
+    if(pd.notna(userMovie[userID][movieID])):
+        return userMovie[userID][movieID] #userMovie[3110][2]
+    
     #Ignore zero-values in NN array, zeros means that there are no neighbors
-    # buren = NN[(NN > 0)]
+    # buren = nn[(nn > 0)]
     # if(buren.size < 1):
     #     return np.nan
     
