@@ -102,19 +102,19 @@ def score(user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFrame, cor
     return predicted_rate
 
 
-def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn: pd.Series, userMovie: pd.DataFrame):
+def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, userMovie: pd.DataFrame):
     
     #Some usefull variables
     normal_um = normalized_data(userMovie)
     overall_movie_mean = userMovie.mean().mean()
 
     newPredictions = predictions.apply(lambda uM: 
-                # ratingScore(uM, predictions, utilMatrix, nn, userMovie), axis=1)
-                score(userMovie, normal_um, utilMatrix, uM, overall_movie_mean))
+                ratingScore(uM, predictions, utilMatrix, nn, userMovie), axis=1)
+                # score(userMovie, normal_um, utilMatrix, uM, overall_movie_mean), axis=1)
 
     return newPredictions
 
-def ratingScore(uM, predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn: pd.Series, userMovie: pd.DataFrame):
+def ratingScore(uM, predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, userMovie: pd.DataFrame):
     
     #Convert to numpy and set properly
     uM1 = uM.to_numpy()
@@ -125,10 +125,23 @@ def ratingScore(uM, predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn: pd.
     if(pd.notna(userMovie[userID][movieID])):
         return userMovie[userID][movieID] #userMovie[3110][2]
     
+    #Get nearest neighbors of active userID
+    buren = nn[userID]
     #Ignore zero-values in NN array, zeros means that there are no neighbors
-    # buren = nn[(nn > 0)]
-    # if(buren.size < 1):
-    #     return np.nan
+    buren = buren[(buren > 0)]
+    print(buren)
+    if(buren.size < 1):
+        return np.nan
+    
+    sim_sum = 0
+    numerator = 0
+    denominator = 0
+    for n in nn[userID]:
+        if(userMovie[n][movieID]):
+            break
+        else:
+            sim = utilMatrix[userID][n]
+            ryi = userMovie[n][movieID]
     
     # #The rxi = numerator/denominator
     # #Check if denominator != 0
