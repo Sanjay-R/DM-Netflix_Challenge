@@ -46,45 +46,40 @@ def normalized_data(df: pd.DataFrame):
     return df_normal
 
 
-def score(userMovies: pd.DataFrame,
-          correlation: pd.DataFrame, ratings: pd.Series, neighbors: pd.Series, movie):
-    # normalized_data(userMovies)
-    # User 42 : [Nan ,Nan , 0.45 , Nan , 0.85]
+def score(user_movies_matrix: pd.DataFrame, correlation: pd.DataFrame, user_id, movie_id):
+    # We use the normalized dataset here.
 
-    if movie in ratings:
-        return ratings[movie]
+    active_user_ratings = user_movies_matrix[user_id]
 
-    ratings_avg = ratings.mean
+    # We get all the neighbors.
+    neighbors_matrix = selectTopNeighbors(50, correlation)
+    # Neighbors of the user.
+    neighbors = neighbors_matrix[user_id]
+
+    # Check if it's already rated.
+    if pd.notna(active_user_ratings[movie_id]):
+        return active_user_ratings[movie_id]
+
+    # Get the average ratings of the user
+    ratings_avg = active_user_ratings.mean(axis=0)
+
+    # Similarity of the ratings of the neighbors to the user that we calculated. It's the denominator.
     sim_sum = 0
     for n in neighbors:
-        sim_sum += correlation.at[movie, n]
+        sim_sum += correlation[user_id][n]
 
+    # Similarity times the normalized average ratings of the users. This is the nominator.
     sim_times_rating = 0
     for n in neighbors:
-        sim_times_rating += (correlation.at[movie, n]
-                             * (userMovies.at[movie, n] - userMovies[n].mean))
+        # If the neighbors have rated that movie, calculate this.
+        if pd.notna(user_movies_matrix[n][movie_id]):
+            sim_times_rating += (correlation[user_id][n] * (
+                    user_movies_matrix[n][movie_id] - user_movies_matrix[n].mean(axis=0)))
 
-    score = ratings_avg + (sim_times_rating / sim_sum)
+    # Calculate the final score
+    predicted_score = ratings_avg + (sim_times_rating / sim_sum)
 
-    return score
-
-
-def scoreItem(df: pd.DataFrame, user: pd.Series
-              , neighbor_rating, neighbor_similarity, ratings):
-    # We will be using the weighted average method to compute the score.
-    # We want to only score items that have not been scored yet.
-    # user_norm = normalized_row(user)
-    # avg_ratings = user.mean
-    #
-    # selectTopNeighbors(df)
-
-    # Two dataframes: Neighbors and Ratings
-
-    df_normal = normalized_data(df)
-
-    # df_normal.apply(scoreRow(row))
-
-    pass
+    return predicted_score
 
 
 def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn: pd.Series, userMovie: pd.DataFrame):

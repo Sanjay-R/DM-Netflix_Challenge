@@ -60,24 +60,30 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     # TODO: REMOVE THIS TEMP 500X500 CUT
     um = userMovie.iloc[:500, :500]
 
+    normal_um = uf.normalized_data(um)
+
     # user-user collaborative matrix
     utilMatrix = uf.pearson(um)
 
     print(userMovie)
 
-    thres = uf.threshold(0.2, 50, utilMatrix)
+    # thres = uf.threshold(0.2, 50, utilMatrix)
 
     print(userMovie[2507][1569])
 
     # top = uf.selectTop(50, utilMatrix)
 
-    # predict_test = uf.score(um, utilMatrix, um.loc['1914'], top.loc['1914'], 1635)
+    # print(normal_um.loc[1])
 
-    # print(utilMatrix)
-    # print(uf.normalized_data(userMovie))
-    # print(thres)
-    # print(predict_test)
-    rate = uf.rating(predictions, utilMatrix, thres, userMovie)
+    # predict_test = uf.score(normal_um, utilMatrix, 8, normal_um[8], top[8], 39)
+
+    predict_test = uf.score(normal_um, utilMatrix, 8, 39)
+
+    print(utilMatrix)
+    print(normal_um)
+    print(top)
+    # print("test is :" , predict_test)
+    print("Answer is drumroll please: ", predict_test)
 
     return thres
 
