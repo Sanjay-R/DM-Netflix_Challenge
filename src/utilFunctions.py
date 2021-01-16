@@ -52,7 +52,7 @@ def score(user_movies_matrix: pd.DataFrame, correlation: pd.DataFrame, user_id, 
     active_user_ratings = user_movies_matrix[user_id]
 
     # We get all the neighbors.
-    neighbors_matrix = selectTopNeighbors(50, correlation)
+    neighbors_matrix = selectTop(50, correlation)
     # Neighbors of the user.
     neighbors = neighbors_matrix[user_id]
 

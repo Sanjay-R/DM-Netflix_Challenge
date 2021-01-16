@@ -67,22 +67,14 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
     print(userMovie)
 
-    # thres = uf.threshold(0.2, 50, utilMatrix)
+    thres = uf.threshold(0.2, 50, utilMatrix)
 
     print(userMovie[2507][1569])
-
-    # top = uf.selectTop(50, utilMatrix)
-
-    # print(normal_um.loc[1])
-
-    # predict_test = uf.score(normal_um, utilMatrix, 8, normal_um[8], top[8], 39)
 
     predict_test = uf.score(normal_um, utilMatrix, 8, 39)
 
     print(utilMatrix)
     print(normal_um)
-    print(top)
-    # print("test is :" , predict_test)
     print("Answer is drumroll please: ", predict_test)
 
     return thres
