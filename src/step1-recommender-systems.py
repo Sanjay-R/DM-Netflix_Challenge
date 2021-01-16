@@ -60,6 +60,7 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     # TODO: REMOVE THIS TEMP 500X500 CUT
     um = userMovie.iloc[:500, :500]
 
+    # TODO: REMOVE this
     normal_um = uf.normalized_data(um)
 
     # user-user collaborative matrix
@@ -70,18 +71,19 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
     thres = uf.threshold(0.2, 50, utilMatrix)
 
-    top = uf.selectTopNeighbors(50, utilMatrix)
+    top = uf.selectTop(50, utilMatrix)
 
     # print(um.loc[1])
 
     # predict_test = uf.score(normal_um, utilMatrix, 8, normal_um[8], top[8], 39)
 
+    # TODO: REMOVE this
     overall_movie_mean = um.mean().mean()
 
 
-    predict_score = uf.score(um, normal_um, utilMatrix, 15, 559 , overall_movie_mean)
+    # predict_score = uf.score(um, normal_um, utilMatrix, 15, 559 , overall_movie_mean)
 
-    # predict_score = uf.score(um, utilMatrix, 732, 16)
+    predict_score2 = uf.rating(predictions[5:10], utilMatrix, thres, userMovie) 
 
     # print(utilMatrix)
     # print(um)

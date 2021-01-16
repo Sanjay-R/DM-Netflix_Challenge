@@ -45,8 +45,13 @@ def normalized_data(df: pd.DataFrame):
     return df_normal
 
 
-def score(user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFrame, correlation: pd.DataFrame, user_id,
-          movie_id, overall_movie_mean: int):
+def score(user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFrame, correlation: pd.DataFrame, uM, overall_movie_mean: int):
+    
+    #Convert to numpy and set properly
+    uM1 = uM.to_numpy()
+    user_id = uM1[0]
+    movie_id = uM1[1]
+
     # Average of the user and movie ratings before normalization
     user_ratings_average_unnormalized = user_movies_matrix[user_id].mean(axis=0)
     movie_ratings_average_unnormalized = user_movies_matrix.loc[movie_id].mean(axis=0)
@@ -98,9 +103,16 @@ def score(user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFrame, cor
 
 
 def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn: pd.Series, userMovie: pd.DataFrame):
+    
+    #Some usefull variables
+    normal_um = normalized_data(userMovie)
+    overall_movie_mean = userMovie.mean().mean()
+
     newPredictions = predictions.apply(lambda uM: 
-                ratingScore(uM, predictions, utilMatrix, nn, userMovie), axis=1)
-    pass
+                # ratingScore(uM, predictions, utilMatrix, nn, userMovie), axis=1)
+                score(userMovie, normal_um, utilMatrix, uM, overall_movie_mean))
+
+    return newPredictions
 
 def ratingScore(uM, predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn: pd.Series, userMovie: pd.DataFrame):
     
