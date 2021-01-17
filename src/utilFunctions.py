@@ -50,6 +50,10 @@ def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFr
     user_id = uM1[0]
     movie_id = uM1[1]
 
+    # Check if it's already rated.
+    if pd.notna(user_movies_matrix[user_id][movie_id]):
+        return user_movies_matrix[user_id][movie_id]
+
     # Average of the user and movie ratings before normalization
     user_ratings_average_unnormalized = user_movies_matrix[user_id].mean(axis=0)
     movie_ratings_average_unnormalized = user_movies_matrix.loc[movie_id].mean(axis=0)
@@ -57,41 +61,39 @@ def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFr
     user_movies_matrix = normalized_matrix
     active_user_ratings = user_movies_matrix[user_id]
 
-    # We get all the neighbors.
-    neighbors_matrix = nn
+    # Calculate the baseline estimate that gets added. 
+    # Not 100% sure about the formula
+    baseline_estimate = overall_movie_mean + (
+            user_ratings_average_unnormalized - overall_movie_mean) + (
+            movie_ratings_average_unnormalized - overall_movie_mean)
+
     # Neighbors of the user.
-    neighbors = neighbors_matrix[user_id]
+    neighbors = nn[user_id]
 
-    # Check if it's already rated.
-    if pd.notna(active_user_ratings[movie_id]):
-        return active_user_ratings[movie_id]
-
-    # Get the average ratings of the user
-    ratings_avg = active_user_ratings.mean(axis=0)
+    # Ignore zero-values in NN array, zeros means that there are no neighbors
+    neighbors = neighbors[(neighbors > 0)]
+    if(neighbors.size < 1):
+        return baseline_estimate
 
     # Similarity of the ratings of the neighbors to the user that we calculated. It's the denominator. What if nan?
     sim_sum = 0
-    # print(neighbors)
-    for n in neighbors:
-        if n == 0: break
-        sim_sum += correlation[user_id][n]
 
     # Similarity times the normalized average ratings of the users. This is the nominator.
     sim_times_rating = 0
+
     for n in neighbors:
-        if n == 0: break
         # If the neighbors have rated that movie, calculate this.
         if pd.notna(user_movies_matrix[n][movie_id]):
-            sim_times_rating += (correlation[user_id][n] * (
-                    user_movies_matrix[n][movie_id] - user_movies_matrix[n].mean(axis=0)))
+            simxy = correlation[user_id][n]
+            ryi = user_movies_matrix[n][movie_id] - user_movies_matrix[n].mean(axis=0)
+            
+            sim_sum += simxy
+            sim_times_rating += (simxy * ryi)
 
+    predicted_score = 0
     # Calculate the final score #rating average
-    if sim_sum == 0:
-        return 0
-    predicted_score = (sim_times_rating / sim_sum)
-    # Calculate the baseline estimate that gets added. Not 100% sure about the formula
-    baseline_estimate = overall_movie_mean + (user_ratings_average_unnormalized - overall_movie_mean) + (
-            movie_ratings_average_unnormalized - overall_movie_mean)
+    if sim_sum != 0:
+        predicted_score = (sim_times_rating / sim_sum)
 
     # To get what the user would rate a movie out of 5
 
@@ -108,8 +110,8 @@ def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, userMovie: p
     overall_movie_mean = userMovie.mean().mean()
 
     newPredictions = predictions.apply(lambda uM: 
-                ratingScore(uM, nn, userMovie, normal_um, utilMatrix, overall_movie_mean), axis=1)
-                # score(uM, nn, userMovie, normal_um, utilMatrix, overall_movie_mean), axis=1)
+                # ratingScore(uM, nn, userMovie, normal_um, utilMatrix, overall_movie_mean), axis=1)
+                score(uM, nn, userMovie, normal_um, utilMatrix, overall_movie_mean), axis=1)
 
     return newPredictions
 
@@ -129,6 +131,7 @@ def ratingScore(uM, nn, userMovie: pd.DataFrame, normal_um, utilMatrix: pd.DataF
 
     # Get nearest neighbors of active userID
     buren = nn[userID]
+    
     # Ignore zero-values in NN array, zeros means that there are no neighbors
     buren = buren[(buren > 0)]
     if (buren.size < 1):

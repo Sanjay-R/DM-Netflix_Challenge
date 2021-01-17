@@ -63,19 +63,20 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
     # print(userMovie)
 
-    thres = uf.threshold(0.2, 50, utilMatrix)
+    nn = np.nan
+    if(randint(1, 3) < 2):
+        nn = uf.threshold(0.2, 50, utilMatrix)
+    else:
+        nn = uf.selectTop(50, utilMatrix)
 
-    # top = uf.selectTop(50, utilMatrix)
 
-    # predict_score = uf.score(userMovie, uf.normalized_data(um), utilMatrix, 15, 559 , userMovie.mean().mean())
-
-    predict_score2 = uf.rating(predictions, utilMatrix, thres, userMovie) 
+    predict_score2 = uf.rating(predictions[5:15], utilMatrix, nn, userMovie) 
 
     # print(utilMatrix)
     # print("thres =>\n\n" , thres)
     # print("\n\n" , top)
     # print("test is :" , predict_test)
-    print("\n\n\nAnswer is drumroll please: \n", predict_score2.to_numpy())
+    print("\n\n\nAnswer is drumroll please: \n", predict_score2)
 
     return predict_score2
 
