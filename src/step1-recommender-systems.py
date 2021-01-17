@@ -64,13 +64,13 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     # print(userMovie)
 
     nn = np.nan
-    if(randint(1, 3) < 2):
+    if(randint(1, 5) < 2):
         nn = uf.threshold(0.2, 50, utilMatrix)
     else:
         nn = uf.selectTop(50, utilMatrix)
 
 
-    predict_score2 = uf.rating(predictions[5:15], utilMatrix, nn, userMovie) 
+    predict_score2 = uf.rating(predictions, utilMatrix, nn, userMovie) 
 
     # print(utilMatrix)
     # print("thres =>\n\n" , thres)
@@ -129,7 +129,8 @@ def predict_random(movies, users, ratings, predictions):
 #####    
 
 ## //!!\\ TO CHANGE by your prediction function
-predictions = predict_random(movies_description, users_description, ratings_description, predictions_description)
+# predictions = predict_random(movies_description, users_description, ratings_description, predictions_description)
+predictions = predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
 
 #Save predictions, should be in the form 'list of tuples' or 'list of lists'
 with open(submission_file, 'w') as submission_writer:
