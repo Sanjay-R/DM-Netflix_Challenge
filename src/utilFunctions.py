@@ -52,7 +52,7 @@ def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFr
 
     # Check if it's already rated.
     if pd.notna(user_movies_matrix[user_id][movie_id]):
-        return user_movies_matrix[user_id][movie_id]
+        return np.array([user_id, user_movies_matrix[user_id][movie_id]])
 
     # Average of the user and movie ratings before normalization
     user_ratings_average_unnormalized = user_movies_matrix[user_id].mean(axis=0)
@@ -60,6 +60,9 @@ def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFr
     # We use the normalized dataset here.
     user_movies_matrix = normalized_matrix
     active_user_ratings = user_movies_matrix[user_id]
+
+    if (np.isnan(movie_ratings_average_unnormalized)): 
+        movie_ratings_average_unnormalized = overall_movie_mean
 
     # Calculate the baseline estimate that gets added. 
     # Not 100% sure about the formula
@@ -73,7 +76,7 @@ def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFr
     # Ignore zero-values in NN array, zeros means that there are no neighbors
     neighbors = neighbors[(neighbors > 0)]
     if(neighbors.size < 1):
-        return baseline_estimate
+        return np.array([user_id, baseline_estimate])
 
     # Similarity of the ratings of the neighbors to the user that we calculated. It's the denominator. What if nan?
     sim_sum = 0
@@ -102,7 +105,7 @@ def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFr
     # We can put limits too, e.g. cut off at above 5 and below 1.
     predicted_rate = max(min(int(round(predicted_rate)), 5), 1)
 
-    return (user_id, predicted_rate)
+    return np.array([user_id, predicted_rate])
 
 
 def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, userMovie: pd.DataFrame):
