@@ -58,27 +58,31 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     # TODO: REMOVE THIS TEMP 500X500 CUT
     um = userMovie.iloc[:500, :500]
 
-    # user-user collaborative matrix
+    #User-User collaborative matrix
     utilMatrix = uf.pearson(userMovie)
 
     # print(userMovie)
 
     nn = np.nan
-    if(randint(1, 5) < 2):
+    if(randint(1, 5) < 3):
         nn = uf.threshold(0.2, 50, utilMatrix)
     else:
         nn = uf.selectTop(50, utilMatrix)
 
 
-    predict_score2 = uf.rating(predictions, utilMatrix, nn, userMovie) 
+    #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
+    all_ratings = uf.rating(predictions, utilMatrix, nn, userMovie).values
 
-    # print(utilMatrix)
-    # print("thres =>\n\n" , thres)
-    # print("\n\n" , top)
-    # print("test is :" , predict_test)
-    print("\n\n\nAnswer is drumroll please: \n", predict_score2)
+    #Create the IDs that we will pass on to the submission.csv file
+    ids = np.arange(1, len(predictions) + 1)
 
-    return predict_score2
+    #We will insert the IDs column to the left of all the ratings
+    predict_score = np.vstack((ids, all_ratings)).transpose()
+
+
+    print("\n\n\nAnswer is drumroll please: \n", predict_score)
+
+    return predict_score
 
 
 predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)

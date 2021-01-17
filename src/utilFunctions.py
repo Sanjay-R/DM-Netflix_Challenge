@@ -9,7 +9,7 @@ def pearson(userMovie):
 
 
 def threshold(t: float, neighbors: int, df: pd.DataFrame):
-    # Lower limit for neighbors is 10
+    #Lower limit for neighbors is 10
     neighbors = max(10, neighbors)
 
     ret = df.apply(lambda row: seriesLargest(neighbors, row[(row > t)]), axis=1)
@@ -24,14 +24,14 @@ def selectTop(neighbors: int, df: pd.DataFrame):
 
 
 def seriesLargest(neighbors: int, row: pd.Series):
-    # Filter out all elements that are below or equal to the threshold
+    #Filter out all elements that are below or equal to the threshold
     s = row.nlargest(neighbors + 1, keep='all').head(neighbors + 1).index.to_numpy()
 
-    # Ignore your own value (user3-user3 bijv), which is also why we take neighbors+1 largest values
-    # Use row.name to get the index
+    #Ignore your own value (user3-user3 bijv), which is also why we take neighbors+1 largest values
+    #Use row.name to get the index
     s = np.delete(s, np.argwhere(s == row.name))
 
-    # If there aren't enough neighbors, pad the array with zeros up to neighbors
+    #If there aren't enough neighbors, pad the array with zeros up to neighbors
     s = np.pad(s, (0, max(0, (neighbors - s.size))), 'constant', constant_values=(0, 0))
 
     return s
@@ -45,47 +45,47 @@ def normalized_data(df: pd.DataFrame):
 
 def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFrame, correlation: pd.DataFrame,
           overall_movie_mean: int):
-    # Convert to numpy and set properly
+    #Convert to numpy and set properly
     uM1 = uM.to_numpy()
     user_id = uM1[0]
     movie_id = uM1[1]
 
-    # Check if it's already rated.
+    #Check if it's already rated.
     if pd.notna(user_movies_matrix[user_id][movie_id]):
-        return np.array([user_id, user_movies_matrix[user_id][movie_id]])
+        return user_movies_matrix[user_id][movie_id]
 
-    # Average of the user and movie ratings before normalization
+    #Average of the user and movie ratings before normalization
     user_ratings_average_unnormalized = user_movies_matrix[user_id].mean(axis=0)
     movie_ratings_average_unnormalized = user_movies_matrix.loc[movie_id].mean(axis=0)
-    # We use the normalized dataset here.
+    #We use the normalized dataset here.
     user_movies_matrix = normalized_matrix
     active_user_ratings = user_movies_matrix[user_id]
 
     if (np.isnan(movie_ratings_average_unnormalized)): 
         movie_ratings_average_unnormalized = overall_movie_mean
 
-    # Calculate the baseline estimate that gets added. 
-    # Not 100% sure about the formula
+    #Calculate the baseline estimate that gets added. 
+    #Not 100% sure about the formula
     baseline_estimate = overall_movie_mean + (
             user_ratings_average_unnormalized - overall_movie_mean) + (
             movie_ratings_average_unnormalized - overall_movie_mean)
 
-    # Neighbors of the user.
+    #Neighbors of the user.
     neighbors = nn[user_id]
 
-    # Ignore zero-values in NN array, zeros means that there are no neighbors
+    #Ignore zero-values in NN array, zeros means that there are no neighbors
     neighbors = neighbors[(neighbors > 0)]
     if(neighbors.size < 1):
-        return np.array([user_id, baseline_estimate])
+        return baseline_estimate
 
-    # Similarity of the ratings of the neighbors to the user that we calculated. It's the denominator. What if nan?
+    #Similarity of the ratings of the neighbors to the user that we calculated. It's the denominator. What if nan?
     sim_sum = 0
 
-    # Similarity times the normalized average ratings of the users. This is the nominator.
+    #Similarity times the normalized average ratings of the users. This is the nominator.
     sim_times_rating = 0
 
     for n in neighbors:
-        # If the neighbors have rated that movie, calculate this.
+        #If the neighbors have rated that movie, calculate this.
         if pd.notna(user_movies_matrix[n][movie_id]):
             simxy = correlation[user_id][n]
             ryi = user_movies_matrix[n][movie_id] - user_movies_matrix[n].mean(axis=0)
@@ -94,22 +94,21 @@ def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFr
             sim_times_rating += (simxy * ryi)
 
     predicted_score = 0
-    # Calculate the final score #rating average
+    #Calculate the final score #rating average
     if sim_sum != 0:
         predicted_score = (sim_times_rating / sim_sum)
 
-    # To get what the user would rate a movie out of 5
-
+    #To get what the user would rate a movie out of 5
     predicted_rate = predicted_score + baseline_estimate
 
-    # We can put limits too, e.g. cut off at above 5 and below 1.
+    #We can put limits too, e.g. cut off at above 5 and below 1.
     predicted_rate = max(min(int(round(predicted_rate)), 5), 1)
 
-    return np.array([user_id, predicted_rate])
+    return predicted_rate
 
 
 def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, userMovie: pd.DataFrame):
-    # Some usefull variables
+    #Some usefull variables
     normal_um = normalized_data(userMovie)
     overall_movie_mean = userMovie.mean().mean()
 
@@ -124,24 +123,24 @@ def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, userMovie: p
 def ratingScore(uM, nn, userMovie: pd.DataFrame, normal_um, utilMatrix: pd.DataFrame, 
             overall_movie_mean: int):
     
-    # Convert to numpy and set properly
+    #Convert to numpy and set properly
     uM1 = uM.to_numpy()
     userID = uM1[0]
     movieID = uM1[1]
 
-    # Check if movie has already been rated
+    #Check if movie has already been rated
     if (pd.notna(userMovie[userID][movieID])):
         return userMovie[userID][movieID]  # userMovie[3110][2]
 
-    # Get nearest neighbors of active userID
+    #Get nearest neighbors of active userID
     buren = nn[userID]
     
-    # Ignore zero-values in NN array, zeros means that there are no neighbors
+    #Ignore zero-values in NN array, zeros means that there are no neighbors
     buren = buren[(buren > 0)]
     if (buren.size < 1):
         return np.nan
 
-    # Set their default values to 0
+    #Set their default values to 0
     sim_sum = 0
     sim_times_rating = 0
 
