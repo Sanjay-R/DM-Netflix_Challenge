@@ -71,13 +71,13 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
     # predict_score = uf.score(userMovie, uf.normalized_data(um), utilMatrix, 15, 559 , userMovie.mean().mean())
 
-    predict_score2 = uf.rating(predictions[5:7], utilMatrix, thres, userMovie) 
+    predict_score2 = uf.rating(predictions, utilMatrix, thres, userMovie) 
 
     # print(utilMatrix)
-    print("thres =>\n\n" , thres)
-    print("\n\n" , top)
+    # print("thres =>\n\n" , thres)
+    # print("\n\n" , top)
     # print("test is :" , predict_test)
-    print("Answer is drumroll please: \n", predict_score2)
+    print("\n\n\nAnswer is drumroll please: \n", predict_score2)
 
     return predict_score2
 

@@ -45,7 +45,7 @@ def normalized_data(df: pd.DataFrame):
     return df_normal
 
 
-def score(user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFrame, correlation: pd.DataFrame, uM, overall_movie_mean: int):
+def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFrame, correlation: pd.DataFrame, overall_movie_mean: int):
     
     #Convert to numpy and set properly
     uM1 = uM.to_numpy()
@@ -60,7 +60,7 @@ def score(user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFrame, cor
     active_user_ratings = user_movies_matrix[user_id]
 
     # We get all the neighbors.
-    neighbors_matrix = selectTop(50, correlation)
+    neighbors_matrix = nn
     # Neighbors of the user.
     neighbors = neighbors_matrix[user_id]
 
@@ -109,12 +109,12 @@ def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, userMovie: p
     overall_movie_mean = userMovie.mean().mean()
 
     newPredictions = predictions.apply(lambda uM: 
-                ratingScore(uM, predictions, utilMatrix, nn, userMovie), axis=1)
-                # score(userMovie, normal_um, utilMatrix, uM, overall_movie_mean), axis=1)
+                # ratingScore(uM, nn, userMovie, normal_um, utilMatrix, overall_movie_mean), axis=1)
+                score(uM, nn, userMovie, normal_um, utilMatrix, overall_movie_mean), axis=1)
 
     return newPredictions
 
-def ratingScore(uM, predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, userMovie: pd.DataFrame):
+def ratingScore(uM, nn, userMovie: pd.DataFrame, normal_um, utilMatrix: pd.DataFrame, overall_movie_mean: int):
     
     #Convert to numpy and set properly
     uM1 = uM.to_numpy()
@@ -129,26 +129,28 @@ def ratingScore(uM, predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, use
     buren = nn[userID]
     #Ignore zero-values in NN array, zeros means that there are no neighbors
     buren = buren[(buren > 0)]
-    print(buren)
     if(buren.size < 1):
         return np.nan
     
+    #Set their default values to 0
     sim_sum = 0
-    numerator = 0
-    denominator = 0
+    sim_times_rating = 0
+
     for n in nn[userID]:
-        if(userMovie[n][movieID]):
-            break
-        else:
-            sim = utilMatrix[userID][n]
-            ryi = userMovie[n][movieID]
+
+        if(n != 0 and pd.notna(userMovie[n][movieID])):
+            simxy = utilMatrix[userID][n]
+            ryi = userMovie[n][movieID] - userMovie[n].mean(axis=0)
+
+            sim_sum += simxy
+            sim_times_rating += (simxy * ryi)
     
-    # #The rxi = numerator/denominator
-    # #Check if denominator != 0
-    # denominator = np.sum(utilMatrix[NN])
-    # if(denominator != 0):
-    #     nominator = 0
-    # else:
-    #     return np.nan
+    #The rxi = numerator/denominator = sim_times_rating/sim_sum
+    #Check if denominator != 0
+    denominator = np.sum(utilMatrix[NN])
+    if(denominator != 0):
+        nominator = 0
+    else:
+        return np.nan
 
     return 0
