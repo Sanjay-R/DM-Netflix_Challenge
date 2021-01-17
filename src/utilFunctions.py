@@ -114,6 +114,8 @@ def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, userMovie: p
 
     return newPredictions
 
+
+### This was mostly for testing and experimenting
 def ratingScore(uM, nn, userMovie: pd.DataFrame, normal_um, utilMatrix: pd.DataFrame, overall_movie_mean: int):
     
     #Convert to numpy and set properly
@@ -147,10 +149,9 @@ def ratingScore(uM, nn, userMovie: pd.DataFrame, normal_um, utilMatrix: pd.DataF
     
     #The rxi = numerator/denominator = sim_times_rating/sim_sum
     #Check if denominator != 0
-    denominator = np.sum(utilMatrix[NN])
-    if(denominator != 0):
-        nominator = 0
-    else:
-        return np.nan
+    # if(denominator != 0):
+    #     nominator = 0
+    # else:
+    #     return np.nan
 
     return 0
