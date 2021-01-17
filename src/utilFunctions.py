@@ -9,8 +9,7 @@ def pearson(userMovie):
 
 
 def threshold(t: float, neighbors: int, df: pd.DataFrame):
-
-    #Lower limit for neighbors is 10
+    # Lower limit for neighbors is 10
     neighbors = max(10, neighbors)
 
     ret = df.apply(lambda row: seriesLargest(neighbors, row[(row > t)]), axis=1)
@@ -19,25 +18,24 @@ def threshold(t: float, neighbors: int, df: pd.DataFrame):
 
 
 def selectTop(neighbors: int, df: pd.DataFrame):
-
     ret = df.apply(lambda row: seriesLargest(neighbors, row), axis=1)
 
     return ret
 
 
 def seriesLargest(neighbors: int, row: pd.Series):
+    # Filter out all elements that are below or equal to the threshold
+    s = row.nlargest(neighbors + 1, keep='all').head(neighbors + 1).index.to_numpy()
 
-    #Filter out all elements that are below or equal to the threshold
-    s = row.nlargest(neighbors+1, keep='all').head(neighbors+1).index.to_numpy()
+    # Ignore your own value (user3-user3 bijv), which is also why we take neighbors+1 largest values
+    # Use row.name to get the index
+    s = np.delete(s, np.argwhere(s == row.name))
 
-    #Ignore your own value (user3-user3 bijv), which is also why we take neighbors+1 largest values
-    #Use row.name to get the index
-    s = np.delete(s, np.argwhere(s==row.name))
-
-    #If there aren't enough neighbors, pad the array with zeros up to neighbors
-    s = np.pad(s, (0, max(0, (neighbors - s.size))), 'constant', constant_values = (0,0))
+    # If there aren't enough neighbors, pad the array with zeros up to neighbors
+    s = np.pad(s, (0, max(0, (neighbors - s.size))), 'constant', constant_values=(0, 0))
 
     return s
+
 
 def normalized_data(df: pd.DataFrame):
     df_mean = df.mean(axis=1)
@@ -45,9 +43,9 @@ def normalized_data(df: pd.DataFrame):
     return df_normal
 
 
-def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFrame, correlation: pd.DataFrame, overall_movie_mean: int):
-    
-    #Convert to numpy and set properly
+def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFrame, correlation: pd.DataFrame,
+          overall_movie_mean: int):
+    # Convert to numpy and set properly
     uM1 = uM.to_numpy()
     user_id = uM1[0]
     movie_id = uM1[1]
@@ -88,6 +86,8 @@ def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFr
                     user_movies_matrix[n][movie_id] - user_movies_matrix[n].mean(axis=0)))
 
     # Calculate the final score #rating average
+    if sim_sum == 0:
+        return 0
     predicted_score = (sim_times_rating / sim_sum)
     # Calculate the baseline estimate that gets added. Not 100% sure about the formula
     baseline_estimate = overall_movie_mean + (user_ratings_average_unnormalized - overall_movie_mean) + (
@@ -103,8 +103,7 @@ def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFr
 
 
 def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, userMovie: pd.DataFrame):
-    
-    #Some usefull variables
+    # Some usefull variables
     normal_um = normalized_data(userMovie)
     overall_movie_mean = userMovie.mean().mean()
 
@@ -116,25 +115,26 @@ def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, userMovie: p
 
 
 ### This was mostly for testing and experimenting
-def ratingScore(uM, nn, userMovie: pd.DataFrame, normal_um, utilMatrix: pd.DataFrame, overall_movie_mean: int):
+def ratingScore(uM, nn, userMovie: pd.DataFrame, normal_um, utilMatrix: pd.DataFrame, 
+            overall_movie_mean: int):
     
-    #Convert to numpy and set properly
+    # Convert to numpy and set properly
     uM1 = uM.to_numpy()
     userID = uM1[0]
     movieID = uM1[1]
 
-    #Check if movie has already been rated
-    if(pd.notna(userMovie[userID][movieID])):
-        return userMovie[userID][movieID] #userMovie[3110][2]
-    
-    #Get nearest neighbors of active userID
+    # Check if movie has already been rated
+    if (pd.notna(userMovie[userID][movieID])):
+        return userMovie[userID][movieID]  # userMovie[3110][2]
+
+    # Get nearest neighbors of active userID
     buren = nn[userID]
-    #Ignore zero-values in NN array, zeros means that there are no neighbors
+    # Ignore zero-values in NN array, zeros means that there are no neighbors
     buren = buren[(buren > 0)]
-    if(buren.size < 1):
+    if (buren.size < 1):
         return np.nan
-    
-    #Set their default values to 0
+
+    # Set their default values to 0
     sim_sum = 0
     sim_times_rating = 0
 
@@ -146,9 +146,9 @@ def ratingScore(uM, nn, userMovie: pd.DataFrame, normal_um, utilMatrix: pd.DataF
 
             sim_sum += simxy
             sim_times_rating += (simxy * ryi)
-    
-    #The rxi = numerator/denominator = sim_times_rating/sim_sum
-    #Check if denominator != 0
+
+    # The rxi = numerator/denominator = sim_times_rating/sim_sum
+    # Check if denominator != 0
     # if(denominator != 0):
     #     nominator = 0
     # else:
