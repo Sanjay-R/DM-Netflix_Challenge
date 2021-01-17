@@ -109,8 +109,8 @@ def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, userMovie: p
     overall_movie_mean = userMovie.mean().mean()
 
     newPredictions = predictions.apply(lambda uM: 
-                # ratingScore(uM, nn, userMovie, normal_um, utilMatrix, overall_movie_mean), axis=1)
-                score(uM, nn, userMovie, normal_um, utilMatrix, overall_movie_mean), axis=1)
+                ratingScore(uM, nn, userMovie, normal_um, utilMatrix, overall_movie_mean), axis=1)
+                # score(uM, nn, userMovie, normal_um, utilMatrix, overall_movie_mean), axis=1)
 
     return newPredictions
 
@@ -138,9 +138,9 @@ def ratingScore(uM, nn, userMovie: pd.DataFrame, normal_um, utilMatrix: pd.DataF
     sim_sum = 0
     sim_times_rating = 0
 
-    for n in nn[userID]:
+    for n in buren:
 
-        if(n != 0 and pd.notna(userMovie[n][movieID])):
+        if(pd.notna(userMovie[n][movieID])):
             simxy = utilMatrix[userID][n]
             ryi = userMovie[n][movieID] - userMovie[n].mean(axis=0)
 

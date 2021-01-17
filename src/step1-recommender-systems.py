@@ -75,7 +75,7 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     # print("thres =>\n\n" , thres)
     # print("\n\n" , top)
     # print("test is :" , predict_test)
-    print("\n\n\nAnswer is drumroll please: \n", predict_score2)
+    print("\n\n\nAnswer is drumroll please: \n", predict_score2.to_numpy())
 
     return predict_score2
 
