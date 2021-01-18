@@ -91,14 +91,26 @@ def predict_latent_factors(movies, users, ratings, predictions):
     ## TO COMPLETE
 
     #Handle NaNs
-    userMovie = userMovie.fillna(0)
-    print("\nuserMovie => \n\n" , userMovie)
+    um = userMovie.fillna(0)
 
-    u, s, vh = np.linalg.svd(userMovie)
+    #Amount of movies
+    no_movies = len(movies.movie.unique())
+    no_years = len(movies.year.unique())
 
-    print("\nu = \n" , u, "\n" , u.shape)
-    print("\n\ns = \n", s, "\n" , s.shape)
-    print("\n\nvh = \n", vh, "\n" , vh.shape)
+    u, s, vh = np.linalg.svd(um)
+
+    total_latent_factors = len(s)
+    econ_LF = int(total_latent_factors*0.8)
+    print("econ_lt = " , econ_LF)
+
+    Q = u[:, :econ_LF]
+    sigma = np.diag(s[:econ_LF])
+    Pt = vh[:econ_LF, :]
+
+
+    print("\nQ = \n" , Q, "\n" , Q.shape)
+    print("\n\nsigma = \n", sigma, "\n" , sigma.shape)
+    print("\n\nPt = \n", Pt, "\n" , Pt.shape)
 
     pass
     
@@ -137,8 +149,8 @@ def predict_random(movies, users, ratings, predictions):
 
 ## //!!\\ TO CHANGE by your prediction function
 # predictions = predict_random(movies_description, users_description, ratings_description, predictions_description)
-predictions = predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
-# throwaway = predict_latent_factors(movies_description, users_description, ratings_description, predictions_description)
+# predictions = predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
+throwaway = predict_latent_factors(movies_description, users_description, ratings_description, predictions_description)
 
 #Save predictions, should be in the form 'list of tuples' or 'list of lists'
 with open(submission_file, 'w') as submission_writer:
