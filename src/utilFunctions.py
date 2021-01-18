@@ -113,51 +113,8 @@ def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, userMovie: p
     overall_movie_mean = userMovie.mean().mean()
 
     newPredictions = predictions.apply(lambda uM: 
-                # ratingScore(uM, nn, userMovie, normal_um, utilMatrix, overall_movie_mean), axis=1)
                 score(uM, nn, userMovie, normal_um, utilMatrix, overall_movie_mean), axis=1)
 
     return newPredictions
 
 
-### This was mostly for testing and experimenting
-def ratingScore(uM, nn, userMovie: pd.DataFrame, normal_um, utilMatrix: pd.DataFrame, 
-            overall_movie_mean: int):
-    
-    #Convert to numpy and set properly
-    uM1 = uM.to_numpy()
-    userID = uM1[0]
-    movieID = uM1[1]
-
-    #Check if movie has already been rated
-    if (pd.notna(userMovie[userID][movieID])):
-        return userMovie[userID][movieID]  # userMovie[3110][2]
-
-    #Get nearest neighbors of active userID
-    buren = nn[userID]
-    
-    #Ignore zero-values in NN array, zeros means that there are no neighbors
-    buren = buren[(buren > 0)]
-    if (buren.size < 1):
-        return np.nan
-
-    #Set their default values to 0
-    sim_sum = 0
-    sim_times_rating = 0
-
-    for n in buren:
-
-        if(pd.notna(userMovie[n][movieID])):
-            simxy = utilMatrix[userID][n]
-            ryi = userMovie[n][movieID] - userMovie[n].mean(axis=0)
-
-            sim_sum += simxy
-            sim_times_rating += (simxy * ryi)
-
-    # The rxi = numerator/denominator = sim_times_rating/sim_sum
-    # Check if denominator != 0
-    # if(denominator != 0):
-    #     nominator = 0
-    # else:
-    #     return np.nan
-
-    return 0

@@ -64,8 +64,7 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
-    all_ratings = uf.rating(predictions, utilMatrix, nn, userMovie).astype('float64').values
-    print("all_ratings = \n" , all_ratings)
+    all_ratings = uf.rating(predictions, utilMatrix, nn, userMovie).values
 
     #Create the IDs that we will pass on to the submission.csv file
     ids = np.arange(1, len(predictions) + 1)
