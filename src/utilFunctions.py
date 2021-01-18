@@ -102,7 +102,7 @@ def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFr
     predicted_rate = predicted_score + baseline_estimate
 
     #We can put limits too, e.g. cut off at above 5 and below 1.
-    predicted_rate = max(min(int(round(predicted_rate)), 5), 1)
+    predicted_rate = max(min(round(predicted_rate, 2), 5), 1)
 
     return predicted_rate
 

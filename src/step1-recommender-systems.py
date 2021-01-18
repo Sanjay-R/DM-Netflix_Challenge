@@ -42,26 +42,19 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
     #userRatingMatrix => merge users and their ratings
     uRM = pd.merge(users, ratings, on='userID')
-    # print(uRM, "\n\n\n")
 
     #userRatingMoviesMatrix => merge users+ratings on the movies they watched
     uRMM = pd.merge(uRM, movies, on='movieID')
-    # print(uRMM, "\n\n\n")
 
-    #userMovie matrix which sets movieID on the rows and userID on the column.
+    #userMovie => matrix which sets movieID on the rows and userID on the column.
     #The ratings are filled in as values
     userMovie = uRMM.pivot(index='movieID', columns='userID', values='rating')
 
     #Now make sure to fill in lost rows
     userMovie = userMovie.reindex(pd.RangeIndex(1, userMovie.index.max() + 1))
 
-    # TODO: REMOVE THIS TEMP 500X500 CUT
-    um = userMovie.iloc[:500, :500]
-
     #User-User collaborative matrix
     utilMatrix = uf.pearson(userMovie)
-
-    # print(userMovie)
 
     nn = np.nan
     if(randint(1, 5) < 3):
@@ -71,7 +64,8 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
-    all_ratings = uf.rating(predictions, utilMatrix, nn, userMovie).astype('int32').values
+    all_ratings = uf.rating(predictions, utilMatrix, nn, userMovie).astype('float64').values
+    print("all_ratings = \n" , all_ratings)
 
     #Create the IDs that we will pass on to the submission.csv file
     ids = np.arange(1, len(predictions) + 1)
@@ -83,9 +77,6 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     print("\n\n\nAnswer is drumroll please: \n", predict_score)
 
     return predict_score
-
-
-predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
 
 
 #####
@@ -139,6 +130,7 @@ predictions = predict_collaborative_filtering(movies_description, users_descript
 #Save predictions, should be in the form 'list of tuples' or 'list of lists'
 with open(submission_file, 'w') as submission_writer:
     #Formates data
+    predictions = [[int(row[0]), row[1]] for row in predictions]
     predictions = [map(str, row) for row in predictions]
     predictions = [','.join(row) for row in predictions]
     predictions = 'Id,Rating\n'+'\n'.join(predictions)
