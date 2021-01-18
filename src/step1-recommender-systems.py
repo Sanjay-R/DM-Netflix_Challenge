@@ -42,36 +42,37 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
     #userRatingMatrix => merge users and their ratings
     uRM = pd.merge(users, ratings, on='userID')
-    # print(uRM, "\n\n\n")
 
     #userRatingMoviesMatrix => merge users+ratings on the movies they watched
     uRMM = pd.merge(uRM, movies, on='movieID')
-    # print(uRMM, "\n\n\n")
 
-    #userMovie matrix which sets movieID on the rows and userID on the column.
+    #moviesUser => matrix which sets userID on the rows and movieID on the column. 
+    #This is used for User-User CF
     #The ratings are filled in as values
-    userMovie = uRMM.pivot(index='movieID', columns='userID', values='rating')
-
+    moviesUser = uRMM.pivot(index='movieID', columns='userID', values='rating')
     #Now make sure to fill in lost rows
-    userMovie = userMovie.reindex(pd.RangeIndex(1, userMovie.index.max() + 1))
+    moviesUser = moviesUser.reindex(pd.RangeIndex(1, moviesUser.index.max() + 1))
 
-    # TODO: REMOVE THIS TEMP 500X500 CUT
-    um = userMovie.iloc[:500, :500]
+
+
+    #userMovie => matrix which sets movieID on the rows and userID on the column.
+    #This is used for Item-Item CF
+    #The ratings are filled in as values
+    userMovie = uRMM.pivot(index='userID', columns='movieID', values='rating')
+
+    
 
     #User-User collaborative matrix
-    utilMatrix = uf.pearson(userMovie)
+    utilUser = uf.pearson(moviesUser)
 
-    # print(userMovie)
+    #Item-Item collaborative matrix
+    utilItem = uf.pearson(userMovie)
 
-    nn = np.nan
-    if(randint(1, 5) < 3):
-        nn = uf.threshold(0.2, 50, utilMatrix)
-    else:
-        nn = uf.selectTop(50, utilMatrix)
+    nn = uf.threshold(0.8, 10, utilUser)
 
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
-    all_ratings = uf.rating(predictions, utilMatrix, nn, userMovie).astype('int32').values
+    all_ratings = uf.rating(predictions, utilUser, nn, moviesUser).values
 
     #Create the IDs that we will pass on to the submission.csv file
     ids = np.arange(1, len(predictions) + 1)
@@ -79,13 +80,7 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     #We will insert the IDs column to the left of all the ratings
     predict_score = np.vstack((ids, all_ratings)).transpose()
 
-
-    print("\n\n\nAnswer is drumroll please: \n", predict_score)
-
     return predict_score
-
-
-predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
 
 
 #####
@@ -139,6 +134,7 @@ predictions = predict_collaborative_filtering(movies_description, users_descript
 #Save predictions, should be in the form 'list of tuples' or 'list of lists'
 with open(submission_file, 'w') as submission_writer:
     #Formates data
+    predictions = [[int(row[0]), row[1]] for row in predictions]
     predictions = [map(str, row) for row in predictions]
     predictions = [','.join(row) for row in predictions]
     predictions = 'Id,Rating\n'+'\n'.join(predictions)
