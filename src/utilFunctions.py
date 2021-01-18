@@ -18,6 +18,9 @@ def threshold(t: float, neighbors: int, df: pd.DataFrame):
 
 
 def selectTop(neighbors: int, df: pd.DataFrame):
+    #Lower limit for neighbors is 10
+    neighbors = max(10, neighbors)
+    
     ret = df.apply(lambda row: seriesLargest(neighbors, row), axis=1)
 
     return ret

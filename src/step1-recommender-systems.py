@@ -56,11 +56,11 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     #User-User collaborative matrix
     utilMatrix = uf.pearson(userMovie)
 
-    nn = np.nan
-    if(randint(1, 5) < 3):
-        nn = uf.threshold(0.2, 50, utilMatrix)
-    else:
-        nn = uf.selectTop(50, utilMatrix)
+    nn = uf.threshold(0.8, 50, utilMatrix)
+    # if(randint(1, 5) < 3):
+    #     nn = uf.threshold(0.2, 50, utilMatrix)
+    # else:
+    #     nn = uf.selectTop(50, utilMatrix)
 
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
@@ -71,9 +71,6 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
     #We will insert the IDs column to the left of all the ratings
     predict_score = np.vstack((ids, all_ratings)).transpose()
-
-
-    print("\n\n\nAnswer is drumroll please: \n", predict_score)
 
     return predict_score
 
