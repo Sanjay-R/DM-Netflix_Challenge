@@ -68,7 +68,7 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     #Item-Item collaborative matrix
     utilItem = uf.pearson(userMovie)
 
-    nn = uf.threshold(0.8, 50, utilUser)
+    nn = uf.threshold(0.8, 10, utilUser)
 
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
