@@ -4,8 +4,8 @@ import os.path
 from random import randint
 
 
-def pearson(userMovie):
-    return userMovie.corr(method="pearson")
+def pearson(moviesUser):
+    return moviesUser.corr(method="pearson")
 
 
 def threshold(t: float, neighbors: int, df: pd.DataFrame):
@@ -46,7 +46,7 @@ def normalized_data(df: pd.DataFrame):
     return df_normal
 
 
-def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFrame, correlation: pd.DataFrame,
+def score(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame, correlation: pd.DataFrame,
           overall_movie_mean: int):
     #Convert to numpy and set properly
     uM1 = uM.to_numpy()
@@ -54,15 +54,15 @@ def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFr
     movie_id = uM1[1]
 
     #Check if it's already rated.
-    if pd.notna(user_movies_matrix[user_id][movie_id]):
-        return user_movies_matrix[user_id][movie_id]
+    if pd.notna(moviesUser[user_id][movie_id]):
+        return moviesUser[user_id][movie_id]
 
     #Average of the user and movie ratings before normalization
-    user_ratings_average_unnormalized = user_movies_matrix[user_id].mean(axis=0)
-    movie_ratings_average_unnormalized = user_movies_matrix.loc[movie_id].mean(axis=0)
+    user_ratings_average_unnormalized = moviesUser[user_id].mean(axis=0)
+    movie_ratings_average_unnormalized = moviesUser.loc[movie_id].mean(axis=0)
     #We use the normalized dataset here.
-    user_movies_matrix = normalized_matrix
-    active_user_ratings = user_movies_matrix[user_id]
+    moviesUser = normalized_matrix
+    active_user_ratings = moviesUser[user_id]
 
     if (np.isnan(movie_ratings_average_unnormalized)): 
         movie_ratings_average_unnormalized = overall_movie_mean
@@ -89,9 +89,9 @@ def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFr
 
     for n in neighbors:
         #If the neighbors have rated that movie, calculate this.
-        if pd.notna(user_movies_matrix[n][movie_id]):
+        if pd.notna(moviesUser[n][movie_id]):
             simxy = correlation[user_id][n]
-            ryi = user_movies_matrix[n][movie_id] - user_movies_matrix[n].mean(axis=0)
+            ryi = moviesUser[n][movie_id] - moviesUser[n].mean(axis=0)
             
             sim_sum += simxy
             sim_times_rating += (simxy * ryi)
@@ -110,13 +110,13 @@ def score(uM, nn, user_movies_matrix: pd.DataFrame, normalized_matrix: pd.DataFr
     return predicted_rate
 
 
-def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, userMovie: pd.DataFrame):
+def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, moviesUser: pd.DataFrame):
     #Some usefull variables
-    normal_um = normalized_data(userMovie)
-    overall_movie_mean = userMovie.mean().mean()
+    normal_um = normalized_data(moviesUser)
+    overall_movie_mean = moviesUser.mean().mean()
 
     newPredictions = predictions.apply(lambda uM: 
-                score(uM, nn, userMovie, normal_um, utilMatrix, overall_movie_mean), axis=1)
+                score(uM, nn, moviesUser, normal_um, utilMatrix, overall_movie_mean), axis=1)
 
     return newPredictions
 

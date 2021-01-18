@@ -46,25 +46,33 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     #userRatingMoviesMatrix => merge users+ratings on the movies they watched
     uRMM = pd.merge(uRM, movies, on='movieID')
 
-    #userMovie => matrix which sets movieID on the rows and userID on the column.
+    #moviesUser => matrix which sets userID on the rows and movieID on the column. 
+    #This is used for User-User CF
     #The ratings are filled in as values
-    userMovie = uRMM.pivot(index='movieID', columns='userID', values='rating')
-
+    moviesUser = uRMM.pivot(index='movieID', columns='userID', values='rating')
     #Now make sure to fill in lost rows
-    userMovie = userMovie.reindex(pd.RangeIndex(1, userMovie.index.max() + 1))
+    moviesUser = moviesUser.reindex(pd.RangeIndex(1, moviesUser.index.max() + 1))
+
+
+
+    #userMovie => matrix which sets movieID on the rows and userID on the column.
+    #This is used for Item-Item CF
+    #The ratings are filled in as values
+    userMovie = uRMM.pivot(index='userID', columns='movieID', values='rating')
+
+    
 
     #User-User collaborative matrix
-    utilMatrix = uf.pearson(userMovie)
+    utilUser = uf.pearson(moviesUser)
 
-    nn = uf.threshold(0.8, 50, utilMatrix)
-    # if(randint(1, 5) < 3):
-    #     nn = uf.threshold(0.2, 50, utilMatrix)
-    # else:
-    #     nn = uf.selectTop(50, utilMatrix)
+    #Item-Item collaborative matrix
+    utilItem = uf.pearson(userMovie)
+
+    nn = uf.threshold(0.8, 50, utilUser)
 
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
-    all_ratings = uf.rating(predictions, utilMatrix, nn, userMovie).values
+    all_ratings = uf.rating(predictions, utilUser, nn, moviesUser).values
 
     #Create the IDs that we will pass on to the submission.csv file
     ids = np.arange(1, len(predictions) + 1)
