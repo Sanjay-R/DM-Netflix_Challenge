@@ -9,8 +9,8 @@ def pearson(moviesUser):
 
 
 def threshold(t: float, neighbors: int, df: pd.DataFrame):
-    #Lower limit for neighbors is 10
-    neighbors = max(10, neighbors)
+    #Lower limit for neighbors is 2
+    neighbors = max(2, neighbors)
 
     ret = df.apply(lambda row: seriesLargest(neighbors, row[(row > t)]), axis=1)
 
@@ -18,8 +18,8 @@ def threshold(t: float, neighbors: int, df: pd.DataFrame):
 
 
 def selectTop(neighbors: int, df: pd.DataFrame):
-    #Lower limit for neighbors is 10
-    neighbors = max(10, neighbors)
+    #Lower limit for neighbors is 2
+    neighbors = max(2, neighbors)
     
     ret = df.apply(lambda row: seriesLargest(neighbors, row), axis=1)
 

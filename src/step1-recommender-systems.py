@@ -54,25 +54,25 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     moviesUser = moviesUser.reindex(pd.RangeIndex(1, moviesUser.index.max() + 1))
 
 
-
     #userMovie => matrix which sets movieID on the rows and userID on the column.
     #This is used for Item-Item CF
     #The ratings are filled in as values
     userMovie = uRMM.pivot(index='userID', columns='movieID', values='rating')
+    #Fill in lost columns
+    userMovie = userMovie.reindex(pd.RangeIndex(1, max(userMovie.columns) + 1), axis='columns')
 
-    
 
-    #User-User collaborative matrix
-    utilUser = uf.pearson(moviesUser)
+    #Item-Item collaborative matrix = userMovie
+    #User-User collaborative matrix = movieUser
+    utilMatrix = uf.pearson(moviesUser)
 
-    #Item-Item collaborative matrix
-    utilItem = uf.pearson(userMovie)
 
-    nn = uf.threshold(0.8, 10, utilUser)
+
+    nn = uf.threshold(0.8, 10, utilMatrix)
 
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
-    all_ratings = uf.rating(predictions, utilUser, nn, moviesUser).values
+    all_ratings = uf.rating(predictions, utilMatrix, nn, moviesUser).values
 
     #Create the IDs that we will pass on to the submission.csv file
     ids = np.arange(1, len(predictions) + 1)
