@@ -31,6 +31,29 @@ users_description = pd.read_csv(users_file, delimiter=';', dtype={'userID':'int'
 ratings_description = pd.read_csv(ratings_file, delimiter=';', dtype={'userID':'int', 'movieID':'int', 'rating':'int'}, names=['userID', 'movieID', 'rating'])
 predictions_description = pd.read_csv(predictions_file, delimiter=';', names=['userID', 'movieID'], header=None)
 
+
+###Global variables
+#userRatingMatrix => merge users and their ratings
+uRM = pd.merge(users_description, ratings_description, on='userID')
+
+#userRatingMoviesMatrix => merge users+ratings on the movies they watched
+uRMM = pd.merge(uRM, movies_description, on='movieID')
+
+#moviesUser => matrix which sets userID on the rows and movieID on the column. 
+#This is used for User-User CF
+#The ratings are filled in as values
+moviesUser = uRMM.pivot(index='movieID', columns='userID', values='rating')
+#Now make sure to fill in lost rows
+moviesUser = moviesUser.reindex(pd.RangeIndex(1, moviesUser.index.max() + 1))
+
+
+#userMovie => matrix which sets movieID on the rows and userID on the column.
+#This is used for Item-Item CF
+#The ratings are filled in as values
+userMovie = uRMM.pivot(index='userID', columns='movieID', values='rating')
+#Fill in lost columns
+userMovie = userMovie.reindex(pd.RangeIndex(1, max(userMovie.columns) + 1), axis='columns')
+
 #####
 ##
 ## COLLABORATIVE FILTERING
@@ -40,36 +63,11 @@ predictions_description = pd.read_csv(predictions_file, delimiter=';', names=['u
 def predict_collaborative_filtering(movies, users, ratings, predictions):
     # TO COMPLETE
 
-    #userRatingMatrix => merge users and their ratings
-    uRM = pd.merge(users, ratings, on='userID')
-
-    #userRatingMoviesMatrix => merge users+ratings on the movies they watched
-    uRMM = pd.merge(uRM, movies, on='movieID')
-
-    #moviesUser => matrix which sets userID on the rows and movieID on the column. 
-    #This is used for User-User CF
-    #The ratings are filled in as values
-    moviesUser = uRMM.pivot(index='movieID', columns='userID', values='rating')
-    #Now make sure to fill in lost rows
-    moviesUser = moviesUser.reindex(pd.RangeIndex(1, moviesUser.index.max() + 1))
-
-
-    #userMovie => matrix which sets movieID on the rows and userID on the column.
-    #This is used for Item-Item CF
-    #The ratings are filled in as values
-    userMovie = uRMM.pivot(index='userID', columns='movieID', values='rating')
-    #Fill in lost columns
-    userMovie = userMovie.reindex(pd.RangeIndex(1, max(userMovie.columns) + 1), axis='columns')
-
-
     #Item-Item collaborative matrix = userMovie
     #User-User collaborative matrix = movieUser
     utilMatrix = uf.pearson(moviesUser)
 
-
-
     nn = uf.threshold(0.8, 10, utilMatrix)
-
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
     all_ratings = uf.rating(predictions, utilMatrix, nn, moviesUser).values
@@ -91,6 +89,16 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     
 def predict_latent_factors(movies, users, ratings, predictions):
     ## TO COMPLETE
+
+    #Handle NaNs
+    userMovie = userMovie.fillna(0)
+    print("\nuserMovie => \n\n" , userMovie)
+
+    u, s, vh = np.linalg.svd(userMovie)
+
+    print("\nu = \n" , u, "\n" , u.shape)
+    print("\n\ns = \n", s, "\n" , s.shape)
+    print("\n\nvh = \n", vh, "\n" , vh.shape)
 
     pass
     
@@ -130,6 +138,7 @@ def predict_random(movies, users, ratings, predictions):
 ## //!!\\ TO CHANGE by your prediction function
 # predictions = predict_random(movies_description, users_description, ratings_description, predictions_description)
 predictions = predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
+# throwaway = predict_latent_factors(movies_description, users_description, ratings_description, predictions_description)
 
 #Save predictions, should be in the form 'list of tuples' or 'list of lists'
 with open(submission_file, 'w') as submission_writer:
