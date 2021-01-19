@@ -157,6 +157,8 @@ def SVDscore(uM, userMovie, Q, Pt, overall_movie_mean):
     user_movie_interaction = np.dot(qi, px) #== X_econ[user_id-1, movie_id-1]
 
     pred = baseline + user_movie_interaction
+    if(np.isnan(pred)):
+        pred = overall_movie_mean
     pred = max(min(round(pred, 2), 5), 1)
 
     return pred
