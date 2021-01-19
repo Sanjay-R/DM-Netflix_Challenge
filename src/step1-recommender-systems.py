@@ -18,11 +18,11 @@ To know more about the expectations, please refer to the guidelines.
 #####
 
 #Where data is located
-movies_file = './data/movies.csv'
-users_file = './data/users.csv'
-ratings_file = './data/ratings.csv'
-predictions_file = './data/predictions.csv'
-submission_file = './data/submission.csv'
+movies_file = 'movies.csv'
+users_file = 'users.csv'
+ratings_file = 'ratings.csv'
+predictions_file = 'predictions.csv'
+submission_file = 'submission.csv'
 
 
 # Read the data using pandas
@@ -68,7 +68,7 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     #Item-Item collaborative matrix
     utilItem = uf.pearson(userMovie)
 
-    nn = uf.threshold(0.8, 10, utilUser)
+    nn = uf.threshold(0.9, 10, utilUser)
 
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
