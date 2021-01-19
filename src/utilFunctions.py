@@ -86,7 +86,7 @@ def score(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame, cor
 
     #Similarity times the normalized average ratings of the users. This is the nominator.
     sim_times_rating = 0
-
+    
     for n in neighbors:
         #If the neighbors have rated that movie, calculate this.
         if pd.notna(normalized_matrix[n][movie_id]):

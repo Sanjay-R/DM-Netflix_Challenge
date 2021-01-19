@@ -56,7 +56,7 @@ userMovie = userMovie.reindex(pd.RangeIndex(1, max(userMovie.columns) + 1), axis
 
 normal_mU = uf.normalized_data(moviesUser)
 normal_uM = uf.normalized_data(userMovie)
-overall_movie_mean = moviesUser.mean().mean()
+overall_movie_mean = np.nanmean(moviesUser)
 
 
 #####
@@ -73,7 +73,7 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     #User-User collaborative matrix = pearson(movieUser).shape = (6040,6040)
     utilMatrix = uf.pearson(moviesUser)
 
-    nn = uf.threshold(0.8, 10, utilMatrix)
+    nn = uf.threshold(0.9, 10, utilMatrix)
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
     all_ratings = uf.rating(predictions, utilMatrix, nn, moviesUser, normal_mU, overall_movie_mean).values
@@ -159,7 +159,7 @@ def predict_random(movies, users, ratings, predictions):
 
 ## //!!\\ TO CHANGE by your prediction function
 # predictions = predict_random(movies_description, users_description, ratings_description, predictions_description)
-# predictions = predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
+predictions = predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
 throwaway = predict_latent_factors(movies_description, users_description, ratings_description, predictions_description)
 
 #Save predictions, should be in the form 'list of tuples' or 'list of lists'
