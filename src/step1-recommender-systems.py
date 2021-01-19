@@ -115,7 +115,7 @@ def predict_latent_factors(movies, users, ratings, predictions):
             lf = i
             break
 
-    lf = 75
+    lf = 35
 
     Q = u[:, :lf]
     sigma = np.diag(s[:lf])
