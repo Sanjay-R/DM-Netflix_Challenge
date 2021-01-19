@@ -107,19 +107,19 @@ def predict_latent_factors(movies, users, ratings, predictions):
     econ_energy = 0.8*total_energy
 
     temp = 0
-    index = 0
-    #Find index where the most energy we want is conserved
+    lf = 0
+    #Find index (=lf) where the most energy we want is conserved
     for i in range(len(sQuared)):
         temp+=sQuared[i]
         if(temp >= econ_energy):
-            index = i
+            lf = i
             break
 
-    index = 100
+    lf = 75
 
-    Q = u[:, :index]
-    sigma = np.diag(s[:index])
-    Vh = vh[:index, :]
+    Q = u[:, :lf]
+    sigma = np.diag(s[:lf])
+    Vh = vh[:lf, :]
     Pt = np.dot(sigma, Vh)   #np.allclose(Pt, (sigma @ Vh)) => True
 
     # X_econ = (Q @ Pt)
