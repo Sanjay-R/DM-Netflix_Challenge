@@ -96,8 +96,8 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 def predict_latent_factors(movies, users, ratings, predictions):
     ## TO COMPLETE
 
-    #Handle NaNs =>  fill it with zeros
-    X = normal_uM.fillna(0)
+    #Handle NaNs =>  fill it with overall global mean
+    X = normal_uM.fillna(overall_movie_mean)
     # print("\nnormal_uM filled w zeros ==>> \n\n" , X.shape)
 
     u, s, vh = np.linalg.svd(X)

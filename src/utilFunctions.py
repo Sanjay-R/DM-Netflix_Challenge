@@ -144,14 +144,6 @@ def SVDscore(uM, userMovie, Q, Pt, overall_movie_mean):
     #WHEN WORKING WITH NUMPY, IT IS ZERO-INDEXED, WHILE USERID AND MOVIEID START AT 1
     qi = Q[user_id-1,:]
     px = Pt[:,movie_id-1]
-    
-    # if(movie_id == 3):
-    #     print("overall = " , overall_movie_mean , "<====")
-    #     print("=>bias user: " , bias_user)
-    #     print("=>bias movie:" , bias_movie)
-    #     print("userid = " , user_id)
-    #     print("Q[user_id,:] = " , qi.shape)
-    #     print("Pt[:,movie_id] = " , px.shape)
 
     baseline = overall_movie_mean + bias_user + bias_movie
     user_movie_interaction = np.dot(qi, px) #== X_econ[user_id-1, movie_id-1]
