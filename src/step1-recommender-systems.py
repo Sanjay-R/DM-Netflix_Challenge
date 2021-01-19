@@ -32,7 +32,7 @@ ratings_description = pd.read_csv(ratings_file, delimiter=';', dtype={'userID':'
 predictions_description = pd.read_csv(predictions_file, delimiter=';', names=['userID', 'movieID'], header=None)
 
 
-###Global variables
+###   Global variables   ###
 #userRatingMatrix => merge users and their ratings
 uRM = pd.merge(users_description, ratings_description, on='userID')
 
@@ -54,6 +54,11 @@ userMovie = uRMM.pivot(index='userID', columns='movieID', values='rating')
 #Fill in lost columns
 userMovie = userMovie.reindex(pd.RangeIndex(1, max(userMovie.columns) + 1), axis='columns')
 
+normal_mU = uf.normalized_data(moviesUser)
+normal_uM = uf.normalized_data(userMovie)
+overall_movie_mean = moviesUser.mean().mean()
+
+
 #####
 ##
 ## COLLABORATIVE FILTERING
@@ -63,14 +68,15 @@ userMovie = userMovie.reindex(pd.RangeIndex(1, max(userMovie.columns) + 1), axis
 def predict_collaborative_filtering(movies, users, ratings, predictions):
     # TO COMPLETE
 
-    #Item-Item collaborative matrix = userMovie
-    #User-User collaborative matrix = movieUser
+    #6040 users & 3706 movies
+    #Item-Item collaborative matrix = pearson(userMovie).shape = (3706, 3706)
+    #User-User collaborative matrix = pearson(movieUser).shape = (6040,6040)
     utilMatrix = uf.pearson(moviesUser)
 
     nn = uf.threshold(0.8, 10, utilMatrix)
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
-    all_ratings = uf.rating(predictions, utilMatrix, nn, moviesUser).values
+    all_ratings = uf.rating(predictions, utilMatrix, nn, moviesUser, normal_mU, overall_movie_mean).values
 
     #Create the IDs that we will pass on to the submission.csv file
     ids = np.arange(1, len(predictions) + 1)
@@ -91,26 +97,30 @@ def predict_latent_factors(movies, users, ratings, predictions):
     ## TO COMPLETE
 
     #Handle NaNs
-    um = userMovie.fillna(0)
+    X = userMovie.fillna(0)
 
-    #Amount of movies
-    no_movies = len(movies.movie.unique())
-    no_years = len(movies.year.unique())
+    print(userMovie.loc[5000, 2000])
 
-    u, s, vh = np.linalg.svd(um)
+    u, s, vh = np.linalg.svd(X)
 
-    total_latent_factors = len(s)
-    econ_LF = int(total_latent_factors*0.8)
-    print("econ_lt = " , econ_LF)
+    sQuared = (s*s).tolist()
+    total_energy = np.sum(sQuared)
+    econ_energy = 0.8*total_energy
 
-    Q = u[:, :econ_LF]
-    sigma = np.diag(s[:econ_LF])
-    Pt = vh[:econ_LF, :]
+    temp = 0
+    index = 0
+    #Find index where the most energy we want is conserved
+    for i in range(len(sQuared)):
+        temp+=sQuared[i]
+        if(temp >= econ_energy):
+            index = i
+            break
 
+    Q = u[:, :index]
+    sigma = np.diag(s[:index])
+    Pt = vh[:index, :]
 
-    print("\nQ = \n" , Q, "\n" , Q.shape)
-    print("\n\nsigma = \n", sigma, "\n" , sigma.shape)
-    print("\n\nPt = \n", Pt, "\n" , Pt.shape)
+    X_a = (Q @ sigma @ Pt)
 
     pass
     

@@ -62,7 +62,7 @@ def score(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame, cor
     movie_ratings_average_unnormalized = moviesUser.loc[movie_id].mean(axis=0)
     #We use the normalized dataset here.
     moviesUser = normalized_matrix
-    active_user_ratings = moviesUser[user_id]
+    active_user_ratings = normalized_matrix[user_id]
 
     if (np.isnan(movie_ratings_average_unnormalized)): 
         movie_ratings_average_unnormalized = overall_movie_mean
@@ -89,9 +89,9 @@ def score(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame, cor
 
     for n in neighbors:
         #If the neighbors have rated that movie, calculate this.
-        if pd.notna(moviesUser[n][movie_id]):
+        if pd.notna(normalized_matrix[n][movie_id]):
             simxy = correlation[user_id][n]
-            ryi = moviesUser[n][movie_id] - moviesUser[n].mean(axis=0)
+            ryi = normalized_matrix[n][movie_id] - normalized_matrix[n].mean(axis=0)
             
             sim_sum += simxy
             sim_times_rating += (simxy * ryi)
@@ -110,14 +110,15 @@ def score(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame, cor
     return predicted_rate
 
 
-def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, moviesUser: pd.DataFrame):
-    #Some usefull variables
-    normal_um = normalized_data(moviesUser)
-    overall_movie_mean = moviesUser.mean().mean()
+def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, moviesUser: pd.DataFrame, 
+            normalized_matrix, overall_movie_mean):
 
     newPredictions = predictions.apply(lambda uM: 
-                score(uM, nn, moviesUser, normal_um, utilMatrix, overall_movie_mean), axis=1)
+                score(uM, nn, moviesUser, normalized_matrix, utilMatrix, overall_movie_mean), axis=1)
 
     return newPredictions
 
 
+def SVDrating(predictions, Q, sigma, Pt, userMovie, overall_movie_mean):
+    #
+    pass
