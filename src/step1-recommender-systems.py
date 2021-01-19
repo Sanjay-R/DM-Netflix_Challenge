@@ -115,6 +115,8 @@ def predict_latent_factors(movies, users, ratings, predictions):
             index = i
             break
 
+    index = 380
+
     Q = u[:, :index]
     sigma = np.diag(s[:index])
     Vh = vh[:index, :]
