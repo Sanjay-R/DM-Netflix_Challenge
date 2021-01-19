@@ -114,8 +114,6 @@ def predict_latent_factors(movies, users, ratings, predictions):
         if(temp >= econ_energy):
             index = i
             break
-    print("90% = " , index)
-    index = 20
 
     Q = u[:, :index]
     sigma = np.diag(s[:index])
