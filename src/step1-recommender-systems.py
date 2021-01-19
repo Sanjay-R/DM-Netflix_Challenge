@@ -104,7 +104,7 @@ def predict_latent_factors(movies, users, ratings, predictions):
 
     sQuared = (s*s).tolist()
     total_energy = np.sum(sQuared)
-    econ_energy = 0.8*total_energy
+    econ_energy = 0.9*total_energy
 
     temp = 0
     index = 0
@@ -114,7 +114,8 @@ def predict_latent_factors(movies, users, ratings, predictions):
         if(temp >= econ_energy):
             index = i
             break
-    index = 50
+    print("90% = " , index)
+    index = 20
 
     Q = u[:, :index]
     sigma = np.diag(s[:index])
