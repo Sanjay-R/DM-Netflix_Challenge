@@ -48,6 +48,7 @@ def normalized_data(df: pd.DataFrame):
 
 def score(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame, correlation: pd.DataFrame,
           overall_movie_mean: int):
+    
     #Convert to numpy and set properly
     uM1 = uM.to_numpy()
     user_id = uM1[0]
@@ -119,6 +120,43 @@ def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, moviesUser: 
     return newPredictions
 
 
-def SVDrating(predictions, Q, sigma, Pt, userMovie, overall_movie_mean):
-    #
-    pass
+def SVDrating(predictions, userMovie, Q, Pt, overall_movie_mean):
+    
+    newPredictions = predictions.apply(lambda uM: 
+                SVDscore(uM, userMovie, Q, Pt, overall_movie_mean), axis=1)
+    
+    return newPredictions
+
+
+def SVDscore(uM, userMovie, Q, Pt, overall_movie_mean):
+
+    #Convert to numpy and set properly
+    uM1 = uM.to_numpy()
+    user_id = uM1[0]
+    movie_id = uM1[1]
+
+    movie_avg = userMovie.loc[user_id, :].mean() #shape=(3706,)
+    user_avg = userMovie.loc[:, movie_id].mean() #shape=(6040,)
+
+    bias_movie =  movie_avg - overall_movie_mean 
+    bias_user = user_avg - overall_movie_mean 
+
+    #WHEN WORKING WITH NUMPY, IT IS ZERO-INDEXED, WHILE USERID AND MOVIEID START AT 1
+    qi = Q[user_id-1,:]
+    px = Pt[:,movie_id-1]
+    
+    # if(movie_id == 3):
+    #     print("overall = " , overall_movie_mean , "<====")
+    #     print("=>bias user: " , bias_user)
+    #     print("=>bias movie:" , bias_movie)
+    #     print("userid = " , user_id)
+    #     print("Q[user_id,:] = " , qi.shape)
+    #     print("Pt[:,movie_id] = " , px.shape)
+
+    baseline = overall_movie_mean + bias_user + bias_movie
+    user_movie_interaction = np.dot(qi, px) #== X_econ[user_id-1, movie_id-1]
+
+    pred = baseline + user_movie_interaction
+    pred = max(min(round(pred, 2), 5), 1)
+
+    return pred

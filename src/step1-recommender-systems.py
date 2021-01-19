@@ -96,10 +96,9 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 def predict_latent_factors(movies, users, ratings, predictions):
     ## TO COMPLETE
 
-    #Handle NaNs
-    X = userMovie.fillna(0)
-
-    print(userMovie.loc[5000, 2000])
+    #Handle NaNs =>  fill it with zeros
+    X = normal_uM.fillna(0)
+    # print("\nnormal_uM filled w zeros ==>> \n\n" , X.shape)
 
     u, s, vh = np.linalg.svd(X)
 
@@ -118,11 +117,18 @@ def predict_latent_factors(movies, users, ratings, predictions):
 
     Q = u[:, :index]
     sigma = np.diag(s[:index])
-    Pt = vh[:index, :]
+    Vh = vh[:index, :]
+    Pt = np.dot(sigma, Vh)   #np.allclose(Pt, (sigma @ Vh)) => True
 
-    X_a = (Q @ sigma @ Pt)
+    # X_econ = (Q @ Pt)
 
-    pass
+    all_ratings = uf.SVDrating(predictions, userMovie, Q, Pt, overall_movie_mean)
+
+    #Create the IDs that we will pass on to the submission.csv file
+    ids = np.arange(1, len(predictions) + 1)
+    pred_SVD = np.vstack((ids, all_ratings)).transpose()
+
+    return pred_SVD
     
     
 #####
@@ -159,8 +165,8 @@ def predict_random(movies, users, ratings, predictions):
 
 ## //!!\\ TO CHANGE by your prediction function
 # predictions = predict_random(movies_description, users_description, ratings_description, predictions_description)
-predictions = predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
-throwaway = predict_latent_factors(movies_description, users_description, ratings_description, predictions_description)
+# predictions = predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
+predictions = predict_latent_factors(movies_description, users_description, ratings_description, predictions_description)
 
 #Save predictions, should be in the form 'list of tuples' or 'list of lists'
 with open(submission_file, 'w') as submission_writer:
