@@ -74,7 +74,7 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
   ##Item-Item
   correlation_item = uf.pearson(userMovie)
-  nn_item = uf.threshold(0.8, 30, correlation_item)
+  nn_item = uf.threshold(0.8, 50, correlation_item)
   item_ratings = uf.ratingItem(predictions, correlation_item, nn_item, userMovie, normal_uM, overall_movie_mean)
 
 
