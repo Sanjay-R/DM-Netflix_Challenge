@@ -31,6 +31,34 @@ users_description = pd.read_csv(users_file, delimiter=';', dtype={'userID':'int'
 ratings_description = pd.read_csv(ratings_file, delimiter=';', dtype={'userID':'int', 'movieID':'int', 'rating':'int'}, names=['userID', 'movieID', 'rating'])
 predictions_description = pd.read_csv(predictions_file, delimiter=';', names=['userID', 'movieID'], header=None)
 
+
+###   Global variables   ###
+#userRatingMatrix => merge users and their ratings
+uRM = pd.merge(users_description, ratings_description, on='userID')
+
+#userRatingMoviesMatrix => merge users+ratings on the movies they watched
+uRMM = pd.merge(uRM, movies_description, on='movieID')
+
+#moviesUser => matrix which sets userID on the rows and movieID on the column. 
+#This is used for User-User CF
+#The ratings are filled in as values
+moviesUser = uRMM.pivot(index='movieID', columns='userID', values='rating')
+#Now make sure to fill in lost rows
+moviesUser = moviesUser.reindex(pd.RangeIndex(1, moviesUser.index.max() + 1))
+
+
+#userMovie => matrix which sets movieID on the rows and userID on the column.
+#This is used for Item-Item CF
+#The ratings are filled in as values
+userMovie = uRMM.pivot(index='userID', columns='movieID', values='rating')
+#Fill in lost columns
+userMovie = userMovie.reindex(pd.RangeIndex(1, max(userMovie.columns) + 1), axis='columns')
+
+normal_mU = uf.normalized_data(moviesUser)
+normal_uM = uf.normalized_data(userMovie)
+overall_movie_mean = np.nanmean(moviesUser)
+
+
 #####
 ##
 ## COLLABORATIVE FILTERING
@@ -40,38 +68,15 @@ predictions_description = pd.read_csv(predictions_file, delimiter=';', names=['u
 def predict_collaborative_filtering(movies, users, ratings, predictions):
     # TO COMPLETE
 
-    #userRatingMatrix => merge users and their ratings
-    uRM = pd.merge(users, ratings, on='userID')
-    # print(uRM, "\n\n\n")
+    #6040 users & 3706 movies !!!
+    #Item-Item collaborative matrix = pearson(userMovie).shape = (3706, 3706)
+    #User-User collaborative matrix = pearson(movieUser).shape = (6040,6040)
+    correlation = uf.pearson(moviesUser)
 
-    #userRatingMoviesMatrix => merge users+ratings on the movies they watched
-    uRMM = pd.merge(uRM, movies, on='movieID')
-    # print(uRMM, "\n\n\n")
-
-    #userMovie matrix which sets movieID on the rows and userID on the column.
-    #The ratings are filled in as values
-    userMovie = uRMM.pivot(index='movieID', columns='userID', values='rating')
-
-    #Now make sure to fill in lost rows
-    userMovie = userMovie.reindex(pd.RangeIndex(1, userMovie.index.max() + 1))
-
-    # TODO: REMOVE THIS TEMP 500X500 CUT
-    um = userMovie.iloc[:500, :500]
-
-    #User-User collaborative matrix
-    utilMatrix = uf.pearson(userMovie)
-
-    # print(userMovie)
-
-    nn = np.nan
-    if(randint(1, 5) < 3):
-        nn = uf.threshold(0.2, 50, utilMatrix)
-    else:
-        nn = uf.selectTop(50, utilMatrix)
-
+    nn = uf.threshold(0.9, 10, correlation)
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
-    all_ratings = uf.rating(predictions, utilMatrix, nn, userMovie).astype('int32').values
+    all_ratings = uf.rating(predictions, correlation, nn, moviesUser, normal_mU, overall_movie_mean).values
 
     #Create the IDs that we will pass on to the submission.csv file
     ids = np.arange(1, len(predictions) + 1)
@@ -79,13 +84,7 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     #We will insert the IDs column to the left of all the ratings
     predict_score = np.vstack((ids, all_ratings)).transpose()
 
-
-    print("\n\n\nAnswer is drumroll please: \n", predict_score)
-
     return predict_score
-
-
-predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
 
 
 #####
@@ -97,7 +96,42 @@ predict_collaborative_filtering(movies_description, users_description, ratings_d
 def predict_latent_factors(movies, users, ratings, predictions):
     ## TO COMPLETE
 
-    pass
+    #Handle NaNs =>  fill it with zeros
+    X = normal_uM.fillna(0)
+    # print("\nnormal_uM filled w zeros ==>> \n\n" , X.shape)
+
+    u, s, vh = np.linalg.svd(X)
+
+    sQuared = (s*s).tolist()
+    total_energy = np.sum(sQuared)
+    econ_energy = 0.8*total_energy
+
+    temp = 0
+    lf = 0
+    #Find index (=lf) where the most energy we want is conserved
+    #We don't use this loop if lf = set to specific number
+    # for i in range(len(sQuared)):
+    #     temp+=sQuared[i]
+    #     if(temp >= econ_energy):
+    #         lf = i
+    #         break
+
+    lf = 50
+
+    Q = u[:, :lf]
+    sigma = np.diag(s[:lf])
+    Vh = vh[:lf, :]
+    Pt = np.dot(sigma, Vh)   #np.allclose(Pt, (sigma @ Vh)) => True
+
+    # X_econ = (Q @ Pt)
+
+    all_ratings = uf.SVDrating(predictions, userMovie, Q, Pt, overall_movie_mean)
+
+    #Create the IDs that we will pass on to the submission.csv file
+    ids = np.arange(1, len(predictions) + 1)
+    pred_SVD = np.vstack((ids, all_ratings)).transpose()
+
+    return pred_SVD
     
     
 #####
@@ -108,6 +142,9 @@ def predict_latent_factors(movies, users, ratings, predictions):
 
 def predict_final(movies, users, ratings, predictions):
   ## TO COMPLETE
+
+  return predict_collaborative_filtering(movies, users, ratings, predictions)
+#   return predict_latent_factors(movies, users, ratings, predictions)
 
   pass
 
@@ -134,11 +171,12 @@ def predict_random(movies, users, ratings, predictions):
 
 ## //!!\\ TO CHANGE by your prediction function
 # predictions = predict_random(movies_description, users_description, ratings_description, predictions_description)
-predictions = predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
+predictions = predict_final(movies_description, users_description, ratings_description, predictions_description)
 
 #Save predictions, should be in the form 'list of tuples' or 'list of lists'
 with open(submission_file, 'w') as submission_writer:
     #Formates data
+    predictions = [[int(row[0]), row[1]] for row in predictions]
     predictions = [map(str, row) for row in predictions]
     predictions = [','.join(row) for row in predictions]
     predictions = 'Id,Rating\n'+'\n'.join(predictions)
