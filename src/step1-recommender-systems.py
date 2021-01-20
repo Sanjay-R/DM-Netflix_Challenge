@@ -103,7 +103,7 @@ def predict_latent_factors(movies, users, ratings, predictions):
   ## TO COMPLETE
 
   #Handle NaNs =>  fill it with zeros
-  X = normal_uM.fillna(0)
+  X = userMovie.fillna(0)
   # print("\nnormal_uM filled w zeros ==>> \n\n" , X.shape)
 
   u, s, vh = np.linalg.svd(X)
@@ -149,8 +149,8 @@ def predict_latent_factors(movies, users, ratings, predictions):
 def predict_final(movies, users, ratings, predictions):
   ## TO COMPLETE
 
-  return predict_collaborative_filtering(movies, users, ratings, predictions)
-#   return predict_latent_factors(movies, users, ratings, predictions)
+  # return predict_collaborative_filtering(movies, users, ratings, predictions)
+  return predict_latent_factors(movies, users, ratings, predictions)
 
   pass
 
