@@ -46,7 +46,7 @@ def normalized_data(df: pd.DataFrame):
     return df_normal
 
 
-def score(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame, correlation: pd.DataFrame,
+def scoreUser(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame, correlation: pd.DataFrame,
           overall_movie_mean: int):
     
     #Convert to numpy and set properly
@@ -61,9 +61,7 @@ def score(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame, cor
     #Average of the user and movie ratings before normalization
     user_ratings_average_unnormalized = moviesUser.loc[:, user_id].mean()
     movie_ratings_average_unnormalized = moviesUser.loc[movie_id, :].mean()
-    #We use the normalized dataset here.
-    moviesUser = normalized_matrix
-    active_user_ratings = normalized_matrix[user_id]
+    
 
     if (np.isnan(movie_ratings_average_unnormalized)):
         movie_ratings_average_unnormalized = overall_movie_mean
@@ -82,7 +80,8 @@ def score(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame, cor
     if(neighbors.size < 1):
         return baseline_estimate
 
-    #Similarity of the ratings of the neighbors to the user that we calculated. It's the denominator. What if nan?
+    #Similarity of the ratings of the neighbors to the user that we calculated. 
+    #It's the denominator. What if nan?
     sim_sum = 0
     for n in neighbors:
         if pd.notna(normalized_matrix[n][movie_id]):
@@ -95,11 +94,11 @@ def score(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame, cor
         #If the neighbors have rated that movie, calculate this.
         if pd.notna(normalized_matrix[n][movie_id]):
             simxy = correlation[user_id][n]
-            ryi = normalized_matrix[n][movie_id] - normalized_matrix[n].mean(axis=0)
+            ryi = normalized_matrix[n][movie_id]
             sim_times_rating += (simxy * ryi)
 
     predicted_score = 0
-    # print("nansum, loop , loop2"  , sim_sum2 ,sim_sum3)
+
     #Calculate the final score #rating average
     if sim_sum != 0:
         predicted_score = (sim_times_rating / sim_sum)
@@ -165,7 +164,7 @@ def scoreItem(uM, nn, userMovie: pd.DataFrame, normalized_matrix: pd.DataFrame, 
             rxj = normalized_matrix.loc[user_id,n] #- normalized_matrix[n].mean(axis=0)
             sim_times_rating += (simxy * rxj)
     predicted_score = 0
-    # print("nansum, loop , loop2"  , sim_sum2 ,sim_sum3)
+    
     # Calculate the final score #rating average
     if sim_sum != 0:
         predicted_score = (sim_times_rating / sim_sum)
@@ -184,11 +183,11 @@ def scoreItem(uM, nn, userMovie: pd.DataFrame, normalized_matrix: pd.DataFrame, 
     return predicted_rate
 
 
-def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, moviesUser: pd.DataFrame,
+def ratingUser(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, moviesUser: pd.DataFrame,
             normalized_matrix, overall_movie_mean):
 
     newPredictions = predictions.apply(lambda uM:
-                score(uM, nn, moviesUser, normalized_matrix, utilMatrix, overall_movie_mean), axis=1)
+                scoreUser(uM, nn, moviesUser, normalized_matrix, utilMatrix, overall_movie_mean), axis=1)
 
     return newPredictions
 

@@ -66,33 +66,31 @@ overall_movie_mean = np.nanmean(moviesUser)
 #####
 
 def predict_collaborative_filtering(movies, users, ratings, predictions):
-    # TO COMPLETE
+  # TO COMPLETE
 
-    #6040 users & 3706 movies !!!
-    #Item-Item collaborative matrix = pearson(userMovie).shape = (3706, 3706)
-    #User-User collaborative matrix = pearson(movieUser).shape = (6040,6040)
-    # utilMatrix_user = uf.pearson(moviesUser)
+  #6040 users & 3706 movies !!!
+  #Item-Item collaborative matrix = pearson(userMovie).shape = (3706, 3706)
+  #User-User collaborative matrix = pearson(movieUser).shape = (6040,6040)
 
-    utilMatrix_item = uf.pearson(userMovie)
+  ##Item-Item
+  # correlation_item = uf.pearson(userMovie)
+  # nn_item = uf.threshold(0.9, 10, correlation_item)
+  # item_ratings = uf.ratingItem(predictions, correlation_item, nn_item, userMovie, normal_uM, overall_movie_mean)
 
 
-    # nn = uf.threshold(0.9, 10, utilMatrix_user)
-    nn_item = uf.threshold(0.9, 10, utilMatrix_item)
+  ##User-User
+  correlation_user = uf.pearson(moviesUser)
+  nn_user = uf.threshold(0.9, 10, correlation_user)
+  user_ratings = uf.ratingUser(predictions, correlation_user, nn_user, moviesUser, normal_mU, overall_movie_mean).values
+  
 
-    #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
-    # all_ratings = uf.rating(predictions, utilMatrix_user, nn, moviesUser, normal_mU, overall_movie_mean).values
+  #Create the IDs that we will pass on to the submission.csv file
+  ids = np.arange(1, len(predictions) + 1)
 
-    #Item ratings
-    item_ratings = uf.ratingItem(predictions, utilMatrix_item, nn_item, userMovie, normal_uM, overall_movie_mean)
+  #We will insert the IDs column to the left of all the ratings
+  predict_score = np.vstack((ids, user_ratings)).transpose()
 
-    #Create the IDs that we will pass on to the submission.csv file
-    ids = np.arange(1, len(predictions) + 1)
-
-    #We will insert the IDs column to the left of all the ratings
-    predict_score = np.vstack((ids, item_ratings)).transpose()
-    #Filling nans
-    predict_score[np.isnan(predict_score)] = overall_movie_mean
-    return predict_score
+  return predict_score
 
 
 #####
