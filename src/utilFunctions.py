@@ -9,8 +9,8 @@ def pearson(moviesUser):
 
 
 def threshold(t: float, neighbors: int, df: pd.DataFrame):
-    #Lower limit for neighbors is 10
-    neighbors = max(10, neighbors)
+    #Lower limit for neighbors is 2
+    neighbors = max(2, neighbors)
 
     ret = df.apply(lambda row: seriesLargest(neighbors, row[(row > t)]), axis=1)
 
@@ -18,8 +18,8 @@ def threshold(t: float, neighbors: int, df: pd.DataFrame):
 
 
 def selectTop(neighbors: int, df: pd.DataFrame):
-    #Lower limit for neighbors is 10
-    neighbors = max(10, neighbors)
+    #Lower limit for neighbors is 2
+    neighbors = max(2, neighbors)
     
     ret = df.apply(lambda row: seriesLargest(neighbors, row), axis=1)
 
@@ -48,6 +48,7 @@ def normalized_data(df: pd.DataFrame):
 
 def score(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame, correlation: pd.DataFrame,
           overall_movie_mean: int):
+    
     #Convert to numpy and set properly
     uM1 = uM.to_numpy()
     user_id = uM1[0]
@@ -58,11 +59,11 @@ def score(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame, cor
         return moviesUser[user_id][movie_id]
 
     #Average of the user and movie ratings before normalization
-    user_ratings_average_unnormalized = moviesUser[user_id].mean(axis=0)
-    movie_ratings_average_unnormalized = moviesUser.loc[movie_id].mean(axis=0)
+    user_ratings_average_unnormalized = moviesUser.loc[:, user_id].mean()
+    movie_ratings_average_unnormalized = moviesUser.loc[movie_id, :].mean()
     #We use the normalized dataset here.
     moviesUser = normalized_matrix
-    active_user_ratings = moviesUser[user_id]
+    active_user_ratings = normalized_matrix[user_id]
 
     if (np.isnan(movie_ratings_average_unnormalized)): 
         movie_ratings_average_unnormalized = overall_movie_mean
@@ -86,12 +87,12 @@ def score(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame, cor
 
     #Similarity times the normalized average ratings of the users. This is the nominator.
     sim_times_rating = 0
-
+    
     for n in neighbors:
         #If the neighbors have rated that movie, calculate this.
-        if pd.notna(moviesUser[n][movie_id]):
+        if pd.notna(normalized_matrix[n][movie_id]):
             simxy = correlation[user_id][n]
-            ryi = moviesUser[n][movie_id] - moviesUser[n].mean(axis=0)
+            ryi = normalized_matrix[n][movie_id] - normalized_matrix[n].mean(axis=0)
             
             sim_sum += simxy
             sim_times_rating += (simxy * ryi)
@@ -110,14 +111,46 @@ def score(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame, cor
     return predicted_rate
 
 
-def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, moviesUser: pd.DataFrame):
-    #Some usefull variables
-    normal_um = normalized_data(moviesUser)
-    overall_movie_mean = moviesUser.mean().mean()
+def rating(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, moviesUser: pd.DataFrame, 
+            normalized_matrix, overall_movie_mean):
 
     newPredictions = predictions.apply(lambda uM: 
-                score(uM, nn, moviesUser, normal_um, utilMatrix, overall_movie_mean), axis=1)
+                score(uM, nn, moviesUser, normalized_matrix, utilMatrix, overall_movie_mean), axis=1)
 
     return newPredictions
 
 
+def SVDrating(predictions, userMovie, Q, Pt, overall_movie_mean):
+    
+    newPredictions = predictions.apply(lambda uM: 
+                SVDscore(uM, userMovie, Q, Pt, overall_movie_mean), axis=1)
+    
+    return newPredictions
+
+
+def SVDscore(uM, userMovie, Q, Pt, overall_movie_mean):
+
+    #Convert to numpy and set properly
+    uM1 = uM.to_numpy()
+    user_id = uM1[0]
+    movie_id = uM1[1]
+
+    movie_avg = userMovie.loc[user_id, :].mean() #shape=(3706,)
+    user_avg = userMovie.loc[:, movie_id].mean() #shape=(6040,)
+
+    bias_movie =  movie_avg - overall_movie_mean 
+    bias_user = user_avg - overall_movie_mean 
+
+    #WHEN WORKING WITH NUMPY, IT IS ZERO-INDEXED, WHILE USERID AND MOVIEID START AT 1
+    qi = Q[user_id-1,:]
+    px = Pt[:,movie_id-1]
+
+    baseline = overall_movie_mean + bias_user + bias_movie
+    user_movie_interaction = np.dot(qi, px) #== X_econ[user_id-1, movie_id-1]
+
+    pred = baseline + user_movie_interaction
+    if(np.isnan(pred)):
+        pred = overall_movie_mean
+    pred = max(min(round(pred, 2), 5), 1)
+
+    return pred
