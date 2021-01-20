@@ -71,19 +71,27 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     #6040 users & 3706 movies
     #Item-Item collaborative matrix = pearson(userMovie).shape = (3706, 3706)
     #User-User collaborative matrix = pearson(movieUser).shape = (6040,6040)
-    utilMatrix = uf.pearson(moviesUser)
+    # utilMatrix_user = uf.pearson(moviesUser)
 
-    nn = uf.threshold(0.9, 10, utilMatrix)
+    utilMatrix_item = uf.pearson(userMovie)
+
+
+    # nn = uf.threshold(0.9, 10, utilMatrix_user)
+    nn_item = uf.threshold(0.9, 10, utilMatrix_item)
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
-    all_ratings = uf.rating(predictions, utilMatrix, nn, moviesUser, normal_mU, overall_movie_mean).values
+    # all_ratings = uf.rating(predictions, utilMatrix_user, nn, moviesUser, normal_mU, overall_movie_mean).values
+
+    #Item ratings
+    item_ratings = uf.ratingItem(predictions, utilMatrix_item, nn_item, userMovie, normal_uM, overall_movie_mean)
 
     #Create the IDs that we will pass on to the submission.csv file
     ids = np.arange(1, len(predictions) + 1)
 
     #We will insert the IDs column to the left of all the ratings
-    predict_score = np.vstack((ids, all_ratings)).transpose()
-
+    predict_score = np.vstack((ids, item_ratings)).transpose()
+    #Filling nans
+    predict_score[np.isnan(predict_score)] = overall_movie_mean
     return predict_score
 
 
