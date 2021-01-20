@@ -113,6 +113,7 @@ def scoreUser(uM, nn, moviesUser: pd.DataFrame, normalized_matrix: pd.DataFrame,
 
 def scoreItem(uM, nn, userMovie: pd.DataFrame, normalized_matrix: pd.DataFrame, correlation: pd.DataFrame,
           overall_movie_mean: int):
+    
     uM1 = uM.to_numpy()
     user_id = uM1[0]
     movie_id = uM1[1]
@@ -122,13 +123,9 @@ def scoreItem(uM, nn, userMovie: pd.DataFrame, normalized_matrix: pd.DataFrame, 
         return userMovie[movie_id][user_id]
 
     # Average of the user and movie ratings before normalization
-    user_ratings_average_unnormalized = userMovie[movie_id].mean(axis=0)
-    movie_ratings_average_unnormalized = userMovie.loc[user_id].mean(axis=0)
+    user_ratings_average_unnormalized = userMovie.loc[user_id, :].mean()
+    movie_ratings_average_unnormalized = userMovie.loc[:, movie_id].mean()
 
-    # We use the normalized dataset here.
-    moviesUser = normalized_matrix
-
-    ##TODO: return baseline or overall?
     if (np.isnan(movie_ratings_average_unnormalized)):
         movie_ratings_average_unnormalized = overall_movie_mean
 
@@ -164,7 +161,7 @@ def scoreItem(uM, nn, userMovie: pd.DataFrame, normalized_matrix: pd.DataFrame, 
             rxj = normalized_matrix.loc[user_id,n] #- normalized_matrix[n].mean(axis=0)
             sim_times_rating += (simxy * rxj)
     predicted_score = 0
-    
+
     # Calculate the final score #rating average
     if sim_sum != 0:
         predicted_score = (sim_times_rating / sim_sum)
@@ -175,10 +172,9 @@ def scoreItem(uM, nn, userMovie: pd.DataFrame, normalized_matrix: pd.DataFrame, 
     # We can put limits too, e.g. cut off at above 5 and below 1.
     predicted_rate = max(min(round(predicted_rate, 2), 5), 1)
 
-    #print(user_id,movie_id,predicted_rate)
 
     # temp, since some values are getting nan which shouldnt be.
-    if np.isnan(predicted_rate): predicted_rate = overall_movie_mean
+    # if np.isnan(predicted_rate): predicted_rate = overall_movie_mean
 
     return predicted_rate
 
@@ -190,6 +186,7 @@ def ratingUser(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, moviesUs
                 scoreUser(uM, nn, moviesUser, normalized_matrix, utilMatrix, overall_movie_mean), axis=1)
 
     return newPredictions
+
 
 def ratingItem(predictions: pd.DataFrame, utilMatrix: pd.DataFrame, nn, userMovies: pd.DataFrame,
             normalized_matrix, overall_movie_mean):
