@@ -80,7 +80,7 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
     nn_item = uf.threshold(0.9, 10, utilMatrix_item)
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
-    # all_ratings = uf.rating(predictions, utilMatrix_user, nn, moviesUser, normal_mU, overall_movie_mean).values
+    #all_ratings = uf.ratingUser(predictions, utilMatrix_user, nn, moviesUser, normal_mU, overall_movie_mean).values
 
     #Item ratings
     item_ratings = uf.ratingItem(predictions, utilMatrix_item, nn_item, userMovie, normal_uM, overall_movie_mean)
