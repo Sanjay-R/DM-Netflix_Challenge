@@ -68,15 +68,15 @@ overall_movie_mean = np.nanmean(moviesUser)
 def predict_collaborative_filtering(movies, users, ratings, predictions):
     # TO COMPLETE
 
-    #6040 users & 3706 movies
+    #6040 users & 3706 movies !!!
     #Item-Item collaborative matrix = pearson(userMovie).shape = (3706, 3706)
     #User-User collaborative matrix = pearson(movieUser).shape = (6040,6040)
-    utilMatrix = uf.pearson(moviesUser)
+    correlation = uf.pearson(moviesUser)
 
-    nn = uf.threshold(0.9, 10, utilMatrix)
+    nn = uf.threshold(0.9, 10, correlation)
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
-    all_ratings = uf.rating(predictions, utilMatrix, nn, moviesUser, normal_mU, overall_movie_mean).values
+    all_ratings = uf.rating(predictions, correlation, nn, moviesUser, normal_mU, overall_movie_mean).values
 
     #Create the IDs that we will pass on to the submission.csv file
     ids = np.arange(1, len(predictions) + 1)
@@ -109,13 +109,14 @@ def predict_latent_factors(movies, users, ratings, predictions):
     temp = 0
     lf = 0
     #Find index (=lf) where the most energy we want is conserved
-    for i in range(len(sQuared)):
-        temp+=sQuared[i]
-        if(temp >= econ_energy):
-            lf = i
-            break
+    #We don't use this loop if lf = set to specific number
+    # for i in range(len(sQuared)):
+    #     temp+=sQuared[i]
+    #     if(temp >= econ_energy):
+    #         lf = i
+    #         break
 
-    lf = 45
+    lf = 50
 
     Q = u[:, :lf]
     sigma = np.diag(s[:lf])
@@ -142,6 +143,9 @@ def predict_latent_factors(movies, users, ratings, predictions):
 def predict_final(movies, users, ratings, predictions):
   ## TO COMPLETE
 
+  return predict_collaborative_filtering(movies, users, ratings, predictions)
+#   return predict_latent_factors(movies, users, ratings, predictions)
+
   pass
 
 
@@ -167,8 +171,7 @@ def predict_random(movies, users, ratings, predictions):
 
 ## //!!\\ TO CHANGE by your prediction function
 # predictions = predict_random(movies_description, users_description, ratings_description, predictions_description)
-# predictions = predict_collaborative_filtering(movies_description, users_description, ratings_description, predictions_description)
-predictions = predict_latent_factors(movies_description, users_description, ratings_description, predictions_description)
+predictions = predict_final(movies_description, users_description, ratings_description, predictions_description)
 
 #Save predictions, should be in the form 'list of tuples' or 'list of lists'
 with open(submission_file, 'w') as submission_writer:
