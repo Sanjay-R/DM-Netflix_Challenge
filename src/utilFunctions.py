@@ -123,8 +123,8 @@ def scoreItem(uM, nn, userMovie: pd.DataFrame, normalized_matrix: pd.DataFrame, 
         return userMovie[movie_id][user_id]
 
     # Average of the user and movie ratings before normalization
-    user_ratings_average_unnormalized = userMovie.loc[movie_id, :].mean()
-    movie_ratings_average_unnormalized = userMovie.loc[:, user_id].mean()
+    user_ratings_average_unnormalized = userMovie.loc[user_id, :].mean()
+    movie_ratings_average_unnormalized = userMovie.loc[:, movie_id].mean()
 
     # We use the normalized dataset here.
     moviesUser = normalized_matrix

@@ -77,7 +77,7 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 
 
     # nn = uf.threshold(0.9, 10, utilMatrix_user)
-    nn_item = uf.threshold(0.9, 10, utilMatrix_item)
+    nn_item = uf.threshold(0.8, 5, utilMatrix_item)
 
     #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
     #all_ratings = uf.ratingUser(predictions, utilMatrix_user, nn, moviesUser, normal_mU, overall_movie_mean).values
@@ -149,9 +149,10 @@ def predict_latent_factors(movies, users, ratings, predictions):
 #####
 
 def predict_final(movies, users, ratings, predictions):
-  ## TO COMPLETE
+  cf = predict_collaborative_filtering(movies, users, ratings, predictions)
+  svd = predict_latent_factors(movies, users, ratings, predictions)
 
-  return predict_collaborative_filtering(movies, users, ratings, predictions)
+  return (cf + svd) / 2
 #   return predict_latent_factors(movies, users, ratings, predictions)
 
   pass
