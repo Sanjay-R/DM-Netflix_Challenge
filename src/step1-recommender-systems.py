@@ -150,13 +150,8 @@ def predict_final(movies, users, ratings, predictions):
   cf = predict_collaborative_filtering(movies, users, ratings, predictions)
   svd = predict_latent_factors(movies, users, ratings, predictions)
 
-<<<<<<< HEAD
-  return predict_collaborative_filtering(movies, users, ratings, predictions)
-  # return predict_latent_factors(movies, users, ratings, predictions)
-=======
   return (cf + svd) / 2
 #   return predict_latent_factors(movies, users, ratings, predictions)
->>>>>>> #9-SVD
 
   pass
 
