@@ -66,25 +66,31 @@ overall_movie_mean = np.nanmean(moviesUser)
 #####
 
 def predict_collaborative_filtering(movies, users, ratings, predictions):
-    # TO COMPLETE
+  # TO COMPLETE
 
-    #6040 users & 3706 movies !!!
-    #Item-Item collaborative matrix = pearson(userMovie).shape = (3706, 3706)
-    #User-User collaborative matrix = pearson(movieUser).shape = (6040,6040)
-    correlation = uf.pearson(moviesUser)
+  #6040 users & 3706 movies !!!
+  #Item-Item collaborative matrix = pearson(userMovie).shape = (3706, 3706)
+  #User-User collaborative matrix = pearson(movieUser).shape = (6040,6040)
 
-    nn = uf.threshold(0.9, 10, correlation)
+  ##Item-Item
+  correlation_item = uf.pearson(userMovie)
+  nn_item = uf.threshold(0.8, 50, correlation_item)
+  item_ratings = uf.ratingItem(predictions, correlation_item, nn_item, userMovie, normal_uM, overall_movie_mean)
 
-    #These are all the ratings we get for all (userID, movieID) pair passed on from predictions.csv
-    all_ratings = uf.rating(predictions, correlation, nn, moviesUser, normal_mU, overall_movie_mean).values
 
-    #Create the IDs that we will pass on to the submission.csv file
-    ids = np.arange(1, len(predictions) + 1)
+  ##User-User
+  # correlation_user = uf.pearson(moviesUser)
+  # nn_user = uf.threshold(0.9, 10, correlation_user)
+  # user_ratings = uf.ratingUser(predictions, correlation_user, nn_user, moviesUser, normal_mU, overall_movie_mean).values
+  
 
-    #We will insert the IDs column to the left of all the ratings
-    predict_score = np.vstack((ids, all_ratings)).transpose()
+  #Create the IDs that we will pass on to the submission.csv file
+  ids = np.arange(1, len(predictions) + 1)
 
-    return predict_score
+  #We will insert the IDs column to the left of all the ratings
+  predict_score = np.vstack((ids, item_ratings)).transpose()
+
+  return predict_score
 
 
 #####
@@ -94,44 +100,44 @@ def predict_collaborative_filtering(movies, users, ratings, predictions):
 #####
     
 def predict_latent_factors(movies, users, ratings, predictions):
-    ## TO COMPLETE
+  ## TO COMPLETE
 
-    #Handle NaNs =>  fill it with zeros
-    X = normal_uM.fillna(0)
-    # print("\nnormal_uM filled w zeros ==>> \n\n" , X.shape)
+  #Handle NaNs =>  fill it with zeros
+  X = normal_uM.fillna(0)
+  # print("\nnormal_uM filled w zeros ==>> \n\n" , X.shape)
 
-    u, s, vh = np.linalg.svd(X)
+  u, s, vh = np.linalg.svd(X)
 
-    sQuared = (s*s).tolist()
-    total_energy = np.sum(sQuared)
-    econ_energy = 0.8*total_energy
+  sQuared = (s*s).tolist()
+  total_energy = np.sum(sQuared)
+  econ_energy = 0.8*total_energy
 
-    temp = 0
-    lf = 0
-    #Find index (=lf) where the most energy we want is conserved
-    #We don't use this loop if lf = set to specific number
-    # for i in range(len(sQuared)):
-    #     temp+=sQuared[i]
-    #     if(temp >= econ_energy):
-    #         lf = i
-    #         break
+  temp = 0
+  lf = 0
+  #Find index (=lf) where the most energy we want is conserved
+  #We don't use this loop if lf = set to specific number
+  # for i in range(len(sQuared)):
+  #     temp+=sQuared[i]
+  #     if(temp >= econ_energy):
+  #         lf = i
+  #         break
 
-    lf = 50
+  lf = 50
 
-    Q = u[:, :lf]
-    sigma = np.diag(s[:lf])
-    Vh = vh[:lf, :]
-    Pt = np.dot(sigma, Vh)   #np.allclose(Pt, (sigma @ Vh)) => True
+  Q = u[:, :lf]
+  sigma = np.diag(s[:lf])
+  Vh = vh[:lf, :]
+  Pt = np.dot(sigma, Vh)   #np.allclose(Pt, (sigma @ Vh)) => True
 
-    # X_econ = (Q @ Pt)
+  # X_econ = (Q @ Pt)
 
-    all_ratings = uf.SVDrating(predictions, userMovie, Q, Pt, overall_movie_mean)
+  all_ratings = uf.SVDrating(predictions, userMovie, Q, Pt, overall_movie_mean)
 
-    #Create the IDs that we will pass on to the submission.csv file
-    ids = np.arange(1, len(predictions) + 1)
-    pred_SVD = np.vstack((ids, all_ratings)).transpose()
+  #Create the IDs that we will pass on to the submission.csv file
+  ids = np.arange(1, len(predictions) + 1)
+  pred_SVD = np.vstack((ids, all_ratings)).transpose()
 
-    return pred_SVD
+  return pred_SVD
     
     
 #####
@@ -141,12 +147,12 @@ def predict_latent_factors(movies, users, ratings, predictions):
 #####
 
 def predict_final(movies, users, ratings, predictions):
-  ## TO COMPLETE
+  # cf = predict_collaborative_filtering(movies, users, ratings, predictions)
+  # lf = predict_latent_factors(movies, users, ratings, predictions)
 
-  return predict_collaborative_filtering(movies, users, ratings, predictions)
-#   return predict_latent_factors(movies, users, ratings, predictions)
+  return predict_latent_factors(movies, users, ratings, predictions)
 
-  pass
+  # return np.round_(((cf + lf) / 2), 2)
 
 
 #####
@@ -158,9 +164,9 @@ def predict_final(movies, users, ratings, predictions):
     
 #By default, predicted rate is a random classifier
 def predict_random(movies, users, ratings, predictions):
-    number_predictions = len(predictions)
+  number_predictions = len(predictions)
 
-    return [[idx, randint(1, 5)] for idx in range(1, number_predictions + 1)]
+  return [[idx, randint(1, 5)] for idx in range(1, number_predictions + 1)]
 
 
 #####
@@ -175,11 +181,11 @@ predictions = predict_final(movies_description, users_description, ratings_descr
 
 #Save predictions, should be in the form 'list of tuples' or 'list of lists'
 with open(submission_file, 'w') as submission_writer:
-    #Formates data
-    predictions = [[int(row[0]), row[1]] for row in predictions]
-    predictions = [map(str, row) for row in predictions]
-    predictions = [','.join(row) for row in predictions]
-    predictions = 'Id,Rating\n'+'\n'.join(predictions)
-    
-    #Writes it dowmn
-    submission_writer.write(predictions)
+  #Formates data
+  predictions = [[int(row[0]), row[1]] for row in predictions]
+  predictions = [map(str, row) for row in predictions]
+  predictions = [','.join(row) for row in predictions]
+  predictions = 'Id,Rating\n'+'\n'.join(predictions)
+  
+  #Writes it dowmn
+  submission_writer.write(predictions)
